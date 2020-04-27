@@ -1,0 +1,29 @@
+{
+  "name": "bemyslavedarlin/teftely",
+  "description": "VK Teftely Bot",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "BeMySlaveDarlin",
+      "email": "bemyslavedarlin@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "7.4.*",
+    "vkcom/vk-php-sdk": "5.101.*"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "Teftely\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\Teftely\\": "tests/"
+    }
+  }
+}

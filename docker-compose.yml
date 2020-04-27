@@ -1,0 +1,45 @@
+version: "3.6"
+services:
+  service_nginx:
+    image: nginx:alpine
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./app/:/app
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/nginx/fastcgi.conf:/etc/nginx/fastcgi.conf
+      - ./docker/nginx/fastcgi-php.conf:/etc/nginx/fastcgi-php.conf
+    ports:
+      - ${SERVICE_NGINX_HTTP_PORTS}
+    depends_on:
+      - service_php
+
+  service_php:
+    build:
+      context: ./
+      dockerfile: ./docker/php/Dockerfile
+    working_dir: /app
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./app/:/app
+      - ./docker/php/php.ini:/etc/php/${PHP_VERSION}/cli/conf.d/99-custom.ini
+      - ./docker/php/php.ini:/etc/php/${PHP_VERSION}/fpm/conf.d/99-custom.ini
+    depends_on:
+      - service_mysql
+
+  service_mysql:
+    image: mysql:5.7.28
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${SERVICE_DB_MYSQL_PORTS}
+    volumes:
+      - db_mysql_data:/var/lib/mysql/
+      - ./docker/mysql/config:/etc/mysql/conf.d/
+
+volumes:
+  db_mysql_data:
