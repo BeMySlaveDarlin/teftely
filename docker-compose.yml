@@ -25,6 +25,7 @@ services:
       - .env
     volumes:
       - ./app/:/app
+      - .env/:/app/.env
       - ./docker/php/php.ini:/etc/php/${PHP_VERSION}/cli/conf.d/99-custom.ini
       - ./docker/php/php.ini:/etc/php/${PHP_VERSION}/fpm/conf.d/99-custom.ini
     depends_on:

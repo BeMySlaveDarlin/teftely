@@ -1,4 +1,4 @@
-# Simple Web Sites Crawler
+# Simple dockerized vk bot - Teftely
 
 ## Requirements
  - PHP 7.4+
@@ -11,7 +11,7 @@
  - Install [Docker](https://docs.docker.com/install/overview/)
  - Install [Docker-compose](https://docs.docker.com/compose/install/)
  - Install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
- - Clone this project locally `git clone https://github.com/BeMySlaveDarlin/Arachnid`
+ - Clone this project locally `git clone https://github.com/BeMySlaveDarlin/teftely`
  - Run **`make install`** in project root
  - Find `.env` and place ur variables and run **`make restart`**
 
