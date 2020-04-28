@@ -4,31 +4,30 @@ declare(strict_types = 1);
 
 namespace Teftely\Components;
 
-use Teftely\Messages\MessageInterface;
+use Teftely\Events\AbstractEvent;
 
 class Response
 {
-    private ?MessageInterface $content = null;
+    private ?AbstractEvent $eventHandler = null;
 
-    public function __construct(?MessageInterface $content = null)
+    public function __construct(?AbstractEvent $eventHandler = null)
     {
-        $this->content = $content;
+        $this->eventHandler = $eventHandler;
     }
 
-    public function setContent(?MessageInterface $content): void
+    public function setEventHandler(?AbstractEvent $eventHandler): void
     {
-        $this->content = $content;
+        $this->eventHandler = $eventHandler;
     }
 
-    public function send(): void
+    public function send(): string
     {
-        if ($this->content instanceof MessageInterface) {
-            echo json_encode(
-                $this->content->toArray(),
-                JSON_THROW_ON_ERROR
-            );
-        } else {
-            echo 'OK';
+        $response = 'OK';
+        if ($this->eventHandler instanceof AbstractEvent) {
+            $this->eventHandler->sendMessage();
+            $response = $this->eventHandler->getResponseData();
         }
+
+        return $response;
     }
 }
