@@ -15,25 +15,14 @@ class Request
         $this->server = $_SERVER;
     }
 
-    public function event(?string $secret): Events
+    public function getData(): ?object
     {
-        if (PHP_SAPI === 'cli') {
-            return new Events(json_decode(
-                '{"type":"console","secret":"' . $secret . '"}',
-                false,
-                512,
-                JSON_THROW_ON_ERROR
-            ));
-        }
-
         $input = file_get_contents('php://input');
         if (false === $input || (false === strpos($input, '{') && false === strpos($input, '}'))) {
-            $data = null;
-        } else {
-            $data = json_decode($input, false, 512, JSON_THROW_ON_ERROR);
+            return null;
         }
 
-        return new Events($data);
+        return json_decode($input, false, 512, JSON_THROW_ON_ERROR);
     }
 
     public function get(?string $key = null)

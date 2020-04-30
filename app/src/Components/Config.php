@@ -8,6 +8,7 @@ class Config
 {
     public const VK_CONFIG = 'vk';
     public const DB_CONFIG = 'db';
+    public const SECRET = 'secret';
 
     public array $configs = [];
 

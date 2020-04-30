@@ -10,7 +10,11 @@ class User extends Model
 {
     private int $id;
     private string $fromId;
-    private bool $isAdmin;
+    private int $isAdmin;
+
+    private const STATUS_USER = 0;
+    private const STATUS_MODER = 1;
+    private const STATUS_ADMIN = 2;
 
     public function findOrCreate(string $fromId, ?array $userData = null): self
     {
@@ -29,11 +33,11 @@ class User extends Model
 
             $this->id = $id;
             $this->fromId = $fromId;
-            $this->isAdmin = false;
+            $this->isAdmin = 0;
         } else {
             $this->id = (int) $userData['id'];
             $this->fromId = (string) $userData['from_id'];
-            $this->isAdmin = (bool) $userData['is_admin'];
+            $this->isAdmin = (int) $userData['is_admin'];
         }
 
         return $this;
@@ -48,10 +52,27 @@ class User extends Model
 
     public function isAdmin(): bool
     {
-        return $this->isAdmin;
+        return $this->isAdmin === 2;
+    }
+
+    public function isModerator(): bool
+    {
+        return $this->isAdmin !== 0;
     }
 
     public function setAdmin(): self
+    {
+        if (isset($this->id)) {
+            $this->database->db()->table('users')
+                ->update(['is_admin' => 2])
+                ->where('id', '=', $this->id)
+                ->run();
+        }
+
+        return $this;
+    }
+
+    public function setModerator(): self
     {
         if (isset($this->id)) {
             $this->database->db()->table('users')

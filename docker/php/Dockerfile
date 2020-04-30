@@ -63,6 +63,7 @@ WORKDIR /app
 RUN mkdir /app/logs && \
     chmod -R 777 /app/logs
 
+
 EXPOSE ${EXPOSE_PORT}
 
 CMD ["php-fpm7.4", "--nodaemonize", "--fpm-config=/etc/php/7.4/fpm/pool.d/www.conf"]

@@ -39,8 +39,5 @@ services:
     ports:
       - ${SERVICE_DB_MYSQL_PORTS}
     volumes:
-      - db_mysql_data:/var/lib/mysql/
+      - ./.data/mysql:/var/lib/mysql/
       - ./docker/mysql/config:/etc/mysql/conf.d/
-
-volumes:
-  db_mysql_data:

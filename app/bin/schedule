@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 declare(strict_types = 1);
@@ -15,7 +16,4 @@ $config = require CNF_PATH . 'config.php';
 $database = new Database($config->get(Config::DB_CONFIG));
 
 $application = new Application($config, $database);
-$response = $application->handle();
-
-echo $response;
-
+$application->schedule();
