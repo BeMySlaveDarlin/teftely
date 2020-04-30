@@ -17,7 +17,7 @@ class Application
         $this->config = require $configPath;
         $this->request = new Request();
         $this->response = new Response();
-        $this->database = new Database($this->config->get('db'));
+        $this->database = new Database($this->config->get(Config::DB_CONFIG));
         $this->logger = new Logger();
     }
 
@@ -28,7 +28,7 @@ class Application
             $eventHandler = $eventManager->getEvent();
 
             $eventHandler->setDatabase($this->database);
-            $eventHandler->setConfig($this->config->get('vk'));
+            $eventHandler->setConfig($this->config->get(Config::VK_CONFIG));
             $eventHandler->setData($eventManager->getData());
 
             $this->response->setEventHandler($eventHandler);
@@ -39,5 +39,9 @@ class Application
         }
 
         echo $response;
+    }
+
+    public function queue(): void
+    {
     }
 }

@@ -11,7 +11,7 @@ use Teftely\Components\Message;
 class AbstractEvent
 {
     protected Config $config;
-    protected Database $db;
+    protected Database $database;
 
     protected ?object $eventData = null;
     protected ?object $message = null;
@@ -24,7 +24,7 @@ class AbstractEvent
         if ($this->config->get('secret') === $secret) {
             $message = $this->eventData->object->message ?? null;
             if (null !== $message) {
-                $this->message = new Message($message, $this->db, $this->config);
+                $this->message = new Message($message, $this->config, $this->database);
                 $this->message->resolve();
             }
         }
@@ -37,7 +37,7 @@ class AbstractEvent
 
     public function setDatabase(Database $database): void
     {
-        $this->db = $database;
+        $this->database = $database;
     }
 
     public function sendMessage(): void

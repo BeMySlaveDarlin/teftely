@@ -8,7 +8,7 @@ use Teftely\Models\Event;
 use Teftely\Models\Peer;
 use Teftely\Models\User;
 
-class Message
+class Message implements \JsonSerializable
 {
     public const METHOD_SEND = 'messages.send';
 
@@ -38,26 +38,19 @@ class Message
 
     private Peer $peer;
     private User $user;
-
-    private string $method = self::METHOD_SEND;
-
-    private object $message;
-    private array $response = [];
     private array $events;
     private array $peersEvents;
 
-    public function __construct(object $message, Database $database, Config $config)
-    {
-        $this->database = $database;
-        $this->config = $config;
-        $this->message = $message;
-        $peerId = $message->peer_id ?: $message->user_id;
-        $this->response['peer_id'] = $peerId;
+    private string $method = self::METHOD_SEND;
+    private object $message;
+    private array $response = [];
 
-        $this->user = User::get($database, (string) $message->from_id);
-        $this->peer = Peer::getPeer($database, $peerId);
-        $this->events = Event::getList($database);
-        $this->peersEvents = Event::getActive($database, $peerId);
+    public function __construct(object $message, Config $config, Database $database)
+    {
+        $this->config = $config;
+        $this->database = $database;
+        $this->message = $message;
+        $this->response['peer_id'] = $message->peer_id ?: $message->user_id;
     }
 
     public function getMethod(): string
@@ -101,6 +94,14 @@ class Message
         }
     }
 
+    private function initDb(): void
+    {
+        $this->user = User::get($this->database, (string) $this->message->from_id);
+        $this->peer = Peer::getPeer($this->database, $this->response['peer_id']);
+        $this->events = Event::getList($this->database);
+        $this->peersEvents = Event::getActive($this->database, $this->response['peer_id']);
+    }
+
     private function help(): bool
     {
         $message = "Доступные команды:\n\n";
@@ -115,6 +116,8 @@ class Message
 
     private function events(): bool
     {
+        $this->initDb();
+
         $message = ["Список событий:\n\n"];
         if (false === $this->peer->isEnabled()) {
             $command = self::COMMAND_TOGGLE;
@@ -142,6 +145,8 @@ class Message
 
     private function subscribe(int $eventId, bool $status): bool
     {
+        $this->initDb();
+
         if ($this->user->isAdmin()) {
             $event = $this->events[$eventId];
             $peerId = $this->peer->getPeerId();
@@ -167,6 +172,8 @@ class Message
 
     private function addEvent(string $payload): bool
     {
+        $this->initDb();
+
         if ($this->user->isAdmin()) {
             $message = 'Некорректный формат добавления события';
             $message .= 'Ожидается [/add_event HH:mm;Название;Описание]';
@@ -205,6 +212,8 @@ class Message
 
     private function delEvent(int $eventId): bool
     {
+        $this->initDb();
+
         if ($this->user->isAdmin()) {
             $event = $this->events[$eventId];
             $message = $event->delete()
@@ -221,6 +230,8 @@ class Message
 
     private function admin(string $password): bool
     {
+        $this->initDb();
+
         if ($password === $this->config->get('password')) {
             $this->user->setAdmin();
             $message = 'Вы получили права администратора';
@@ -235,6 +246,8 @@ class Message
 
     private function toggle(): bool
     {
+        $this->initDb();
+
         if ($this->user->isAdmin()) {
             if ($this->peer->isEnabled()) {
                 $message = $this->peer->disable() ? 'Бот отключен' : 'Не удалось отключить';
@@ -252,10 +265,20 @@ class Message
 
     private function status(): bool
     {
+        $this->initDb();
+
         $message = $this->peer->isEnabled() ? 'Бот включен' : 'Бот отключен';
 
         $this->response['message'] = $message;
 
         return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        // TODO: Implement jsonSerialize() method.
     }
 }

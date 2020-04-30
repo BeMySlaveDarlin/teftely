@@ -11,14 +11,15 @@ use Spiral\Database\Driver\MySQL\MySQLDriver;
 
 class Database
 {
-    private DatabaseManager $dbm;
+    private DatabaseConfig $dbc;
+    private ?DatabaseInterface $db = null;
 
     public function __construct(Config $config)
     {
         $host = $config->get('host');
         $dbName = $config->get('db_name');
 
-        $this->dbm = new DatabaseManager(new DatabaseConfig([
+        $this->dbc = new DatabaseConfig([
             'default' => 'default',
             'databases' => [
                 'default' => ['connection' => 'mysql'],
@@ -33,11 +34,16 @@ class Database
                     ],
                 ],
             ],
-        ]));
+        ]);
     }
 
     public function db(): DatabaseInterface
     {
-        return $this->dbm->database();
+        if (null === $this->db) {
+            $dbm = new DatabaseManager($this->dbc);
+            $this->db = $dbm->database();
+        }
+
+        return $this->db;
     }
 }

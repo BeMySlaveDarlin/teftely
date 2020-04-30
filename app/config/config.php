@@ -5,7 +5,7 @@ declare(strict_types = 1);
 use Teftely\Components\Config;
 
 return new Config([
-    'vk' => [
+    Config::VK_CONFIG => [
         'password' => getenv('ADMIN_PASSWORD'),
         'secret' => getenv('SECRET_CODE'),
         'confirmation' => getenv('CONFIRMATION_CODE'),
@@ -14,7 +14,7 @@ return new Config([
         'api_endpoint' => getenv('API_ENDPOINT'),
         'group_id' => getenv('GROUP_ID'),
     ],
-    'db' => [
+    Config::DB_CONFIG => [
         'host' => getenv('MYSQL_HOST'),
         'db_name'=> getenv('MYSQL_DATABASE'),
         'user'=> getenv('MYSQL_USER'),

@@ -6,6 +6,9 @@ namespace Teftely\Components;
 
 class Config
 {
+    public const VK_CONFIG = 'vk';
+    public const DB_CONFIG = 'db';
+
     public array $configs = [];
 
     public function __construct(array $params = [])
