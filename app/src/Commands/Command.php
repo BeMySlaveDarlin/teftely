@@ -8,6 +8,7 @@ use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Components\Message;
 use Teftely\Components\Payload;
+use Wkhooy\ObsceneCensorRus;
 
 abstract class Command
 {
@@ -21,6 +22,8 @@ abstract class Command
     public const COMMAND_DEL_EVENT = '/del_event';
     public const COMMAND_ADMIN = '/admin';
     public const COMMAND_MODER = '/moder';
+    public const COMMAND_OBSCENE = '/obscene';
+    public const COMMAND_LAZY = '/lazy';
 
     public const COMMANDS = [
         self::COMMAND_HELP => CommandHelp::class,
@@ -33,6 +36,8 @@ abstract class Command
         self::COMMAND_DEL_EVENT => CommandDelEvent::class,
         self::COMMAND_ADMIN => CommandAdmin::class,
         self::COMMAND_MODER => CommandModer::class,
+        self::COMMAND_OBSCENE => CommandObscene::class,
+        self::COMMAND_LAZY => CommandLazy::class,
     ];
 
     public const DESCRIPTIONS = [
@@ -57,14 +62,21 @@ abstract class Command
         $message = $request->object->message ?? null;
 
         $messageText = $message->text ?? null;
+        $hasNoObscene = ObsceneCensorRus::isAllowed($messageText);
+        $hasNoObscene = (bool) random_int(0, (int) $hasNoObscene);
         $messageTextParts = is_string($messageText) ? explode($delimiter, $messageText) : [];
 
-        $slashed = array_shift($messageTextParts);
+        $slashed = $hasNoObscene ? array_shift($messageTextParts) : self::COMMAND_OBSCENE;
         $payload = implode($delimiter, $messageTextParts);
 
+        $commandClass = null;
         if (isset(self::COMMANDS[$slashed])) {
             $commandClass = self::COMMANDS[$slashed];
+        } elseif (random_int(0, 1000) === 0) {
+            $commandClass = self::COMMANDS[self::COMMAND_LAZY];
+        }
 
+        if ($commandClass !== null) {
             /** @var Command $command */
             $command = new $commandClass();
             $command->setPayload($request, $payload);
