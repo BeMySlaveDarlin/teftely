@@ -31,6 +31,23 @@ services:
     depends_on:
       - service_mysql
 
+  service_cron:
+    build:
+      context: ./
+      dockerfile: ./docker/php/Dockerfile-cron
+    working_dir: /app
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./app/:/app
+      - .env/:/app/.env
+      - ./docker/php/php.ini:/etc/php/${PHP_VERSION}/cli/conf.d/99-custom.ini
+      - ./docker/php/php.ini:/etc/php/${PHP_VERSION}/fpm/conf.d/99-custom.ini
+    depends_on:
+      - service_mysql
+      - service_php
+
   service_mysql:
     image: mysql:5.7.28
     restart: always

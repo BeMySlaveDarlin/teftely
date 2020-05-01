@@ -43,22 +43,36 @@ class Application
 
     public function schedule(): void
     {
-        $time = date('H:i:00', strtotime('+3 hours'));
-        print "Sending events for time $time" . PHP_EOL;
+        do {
+            try {
+                $time = date('H:i:00', strtotime('+3 hours'));
+                print "Sending events for time $time" . PHP_EOL;
 
-        $peersEvents = Event::getListActive($this->database, $time);
-        foreach ($peersEvents as $eventId => $event) {
-            print "Sending event #$eventId" . PHP_EOL;
+                $peersEvents = Event::getListActive($this->database, $time);
+                $foundPE = count($peersEvents);
+                print "Found {$foundPE} events" . PHP_EOL;
 
-            $params = [
-                'peer_id' => $event->getPeerId(),
-                'message' => $event->getFormattedMessage($peersEvents),
-            ];
-            if (null !== $event->getAttachment()) {
-                $params['attachment'] = $event->getAttachment();
+                foreach ($peersEvents as $eventId => $event) {
+                    try {
+                        print "Sending event #$eventId" . PHP_EOL;
+                        $params = [
+                            'peer_id' => $event->getPeerId(),
+                            'message' => $event->getMessage(),
+                        ];
+                        if (null !== $event->getAttachment()) {
+                            $params['attachment'] = $event->getAttachment();
+                        }
+                        $this->response->send($this->config->get(Config::VK_CONFIG), Message::METHOD_SEND, $params);
+                    } catch (\Throwable $throwable) {
+                        $this->logger->log(Logger::INFO, $throwable->getMessage());
+                    }
+                }
+            } catch (\Throwable $throwable) {
+                $this->logger->log(Logger::INFO, $throwable->getMessage());
             }
-            $this->response->send($this->config->get(Config::VK_CONFIG), Message::METHOD_SEND, $params);
-        }
+
+            sleep(60);
+        } while (true);
     }
 
     public function sendMessage(array $argv): void

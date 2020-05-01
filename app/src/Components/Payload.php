@@ -43,7 +43,12 @@ class Payload
             $type = $attachment->type;
             $id = $attachment->$type->id ?? null;
             $ownerId = $attachment->$type->owner_id ?? null;
+            $accessKey = $attachment->$type->access_key ?? null;
             if (null !== $id) {
+                if (null !== $accessKey) {
+                    return "{$type}{$ownerId}_{$id}_($accessKey)";
+                }
+
                 return "{$type}{$ownerId}_{$id}";
             }
         }
