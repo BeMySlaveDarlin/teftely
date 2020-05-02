@@ -9,6 +9,7 @@ use Teftely\Commands\Command;
 class Message
 {
     public const METHOD_SEND = 'messages.send';
+    public const METHOD_USERS_GET = 'users.get';
 
     public object $request;
 

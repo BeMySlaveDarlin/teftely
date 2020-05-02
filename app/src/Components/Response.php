@@ -11,8 +11,8 @@ class Response
         $params['access_token'] = $vkConfig->get('access_token');
         $params['v'] = $vkConfig->get('api_version');
         $params['random_id'] = $this->getRandomId();
-        if (isset($params['peer_id']) && null === $params['peer_id']) {
-            throw new \RuntimeException("[$method] peer_id is not defined");
+        if (isset($params['peer_id']) && empty($params['peer_id'])) {
+            unset($params['peer_id'], $params['random_id']);
         }
 
         $url = $vkConfig->get('api_endpoint') . $method;
@@ -29,9 +29,13 @@ class Response
         }
 
         curl_close($curl);
-        $response = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-        if (!$response || !isset($response['response'])) {
-            throw new \RuntimeException("Invalid response for [$method] request: $json");
+        try {
+            $response = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+            if (!$response || !isset($response['response'])) {
+                throw new \RuntimeException("Invalid response for [$method] request: $json");
+            }
+        } catch (\Throwable $throwable) {
+            throw $throwable;
         }
 
         return $json;

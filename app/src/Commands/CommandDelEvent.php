@@ -13,13 +13,17 @@ class CommandDelEvent extends Command
 {
     public function run(Config $vkConfig, Database $database): void
     {
-        $user = User::get($database, (string) $this->payload->getFromId());
+        $user = User::findOrCreate($database, $this->payload->getFromId());
 
         if ($user->isAdmin()) {
-            $event = Event::getOne($database, $this->payload->getPayload());
-            $message = $event->delete()
-                ? "Событие #{$event->getId()} удалено"
-                : "Событие #{$event->getId()} не удалено";
+            $event = Event::findOne($database, $this->payload->getPayload());
+            if (null === $event) {
+                $message = "Событие #{$this->payload->getPayload()} не существует";
+            } else {
+                $message = $event->delete()
+                    ? "Событие #{$event->getId()} удалено"
+                    : "Событие #{$event->getId()} не удалено";
+            }
         } else {
             $message = 'Только админ может удалять события';
         }

@@ -14,10 +14,10 @@ class CommandUnsubscribe extends Command
 {
     public function run(Config $vkConfig, Database $database): void
     {
-        $user = User::get($database, (string) $this->payload->getFromId());
-        $peer = Peer::getOne($database, $this->payload->getPeerId());
-        $events = Event::getList($database);
-        $peersEvents = Event::getListActive($database, null, $this->payload->getPeerId());
+        $user = User::findOrCreate($database, $this->payload->getFromId());
+        $peer = Peer::findOrCreate($database, $this->payload->getPeerId());
+        $events = Event::findList($database);
+        $peersEvents = Event::findListActive($database, null, $this->payload->getPeerId());
 
         if ($user->isModerator()) {
             $eventId = (int) $this->payload->getPayload();

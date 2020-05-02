@@ -20,7 +20,7 @@ class Message extends Model
         $data = [
             'peer_id' => (string) $peerId,
             'from_id' => (string) $fromId,
-            'message' => (string) $text,
+            'message' => htmlentities($text),
             'time' => date('Y-m-d H:i:s'),
         ];
         $id = $table->insertOne($data);

@@ -10,77 +10,72 @@ class Peer extends Model
 {
     private int $id;
     private string $peerId;
-    private bool $isAdmin;
     private bool $isEnabled;
 
-    public function findOrCreate($peerId, ?array $peerData = null): self
-    {
-        if (empty($peerData['id'])) {
-            $peerData = $this->database->db()
-                ->select()
-                ->from('peers')
-                ->where('peer_id', '=', (string) $peerId)
-                ->run()
-                ->fetch();
-        }
-
-        if (empty($peerData)) {
-            $table = $this->database->db()->table('peers');
-            $id = $table->insertOne([
-                'peer_id' => $peerId,
-            ]);
-
-            $this->id = $id;
-            $this->peerId = (string) $peerId;
-            $this->isAdmin = false;
-            $this->isEnabled = false;
-        } else {
-            $this->id = (int) $peerData['id'];
-            $this->peerId = (string) $peerData['peer_id'];
-            $this->isAdmin = (bool) ($peerData['is_admin'] ?? null);
-            $this->isEnabled = (bool) $peerData['is_enabled'];
-        }
+    public function assign(
+        $id,
+        string $peerId,
+        $isEnabled = null
+    ): self {
+        $this->id = (int) $id;
+        $this->peerId = $peerId;
+        $this->isEnabled = (bool) $isEnabled;
 
         return $this;
     }
 
-    public function getId(): int
+    public static function findOrCreate(Database $database, $peerId): self
     {
-        return $this->id;
-    }
-
-    public function getPeerId(): string
-    {
-        return $this->peerId;
-    }
-
-    public static function getOne(Database $database, $peerId): self
-    {
-        $peer = new self($database);
-
-        return $peer->findOrCreate((string) $peerId);
-    }
-
-    public static function getList(Database $database): array
-    {
-        $peers = [];
-        $query = $database->db()->select()->from('peers');
-        $results = $query->fetchAll();
-
-        if ($results) {
-            foreach ($results as $result) {
-                $peer = new self($database);
-                $peer->findOrCreate(null, $result);
-                $peers[$result['id']] = $peer;
-            }
+        $peer = self::findOne($database, $peerId);
+        if (null === $peer) {
+            $peer = self::createOne($database, $peerId);
         }
 
-        return $peers;
+        return $peer;
     }
 
-    public function isEnabled(): bool
+    public static function findOne(Database $database, $peerId): self
     {
-        return $this->isEnabled;
+        if (null === $peerId) {
+            return null;
+        }
+
+        $result = $database->db()
+            ->select()
+            ->from('peers')
+            ->where('peer_id', '=', $peerId)
+            ->run()
+            ->fetch();
+
+        if (!empty($result)) {
+            $peer = new self($database);
+            $peer->assign(
+                $result['id'],
+                $result['peer_id'],
+                $result['is_enabled']
+            );
+
+            return $peer;
+        }
+
+        return null;
+    }
+
+    public static function createOne(Database $database, string $peerId): ?self
+    {
+        $table = $database->db()->table('peers');
+        $peerData = [
+            'peer_id' => $peerId,
+        ];
+        $id = $table->insertOne($peerData);
+
+        $peer = new self($database);
+        $peer->assign(
+            $id,
+            $peerId
+        );
+
+        return $peer;
     }
 
     public function enable(): bool
@@ -105,5 +100,20 @@ class Peer extends Model
         }
 
         return false;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->isEnabled;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getPeerId(): string
+    {
+        return $this->peerId;
     }
 }

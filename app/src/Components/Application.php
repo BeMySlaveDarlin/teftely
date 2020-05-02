@@ -46,13 +46,19 @@ class Application
         do {
             try {
                 $time = date('H:i:00', strtotime('+3 hours'));
+                $week = (string) (date('w') + 1);
                 print "Sending events for time $time" . PHP_EOL;
 
-                $peersEvents = Event::getListActive($this->database, $time);
+                $peersEvents = Event::findListActive($this->database, $time);
                 $foundPE = count($peersEvents);
                 print "Found {$foundPE} events" . PHP_EOL;
 
                 foreach ($peersEvents as $eventId => $event) {
+                    $eventWeek = $event->getWeek();
+                    if (null !== $eventWeek && $week !== $eventWeek) {
+                        print "Skipping event #$eventId: wrong weekday" . PHP_EOL;
+                        continue;
+                    }
                     try {
                         print "Sending event #$eventId" . PHP_EOL;
                         $params = [
@@ -82,7 +88,10 @@ class Application
         try {
             /** @var Message $message */
             $message = EventManager::unpack($argv[1]);
-            $message->send($this->config->get(Config::VK_CONFIG), $this->database, $this->response);
+            $response = $message->send($this->config->get(Config::VK_CONFIG), $this->database, $this->response);
+            if (!empty($response)) {
+                $this->logger->log(Logger::INFO, $response);
+            }
         } catch (\Throwable $throwable) {
             $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
         }

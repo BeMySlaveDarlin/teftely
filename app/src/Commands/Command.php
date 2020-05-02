@@ -8,6 +8,7 @@ use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Components\Message;
 use Teftely\Components\Payload;
+use Teftely\Components\Response;
 use Teftely\Models\User;
 
 abstract class Command
@@ -49,7 +50,7 @@ abstract class Command
         self::COMMAND_TOGGLE => 'включить/отключить бота',
         self::COMMAND_SUBSCRIBE => 'подписаться на событие <ID>',
         self::COMMAND_UNSUBSCRIBE => 'отписаться от события <ID>',
-        self::COMMAND_ADD_EVENT => 'новое событие HH:mm"Название"Описание. Пример: /add_event 08:00"Парам-пам"Пора вставать и унывать',
+        self::COMMAND_ADD_EVENT => 'добавить событие',
         self::COMMAND_DEL_EVENT => 'удалить событие <ID>',
     ];
 
@@ -63,6 +64,7 @@ abstract class Command
         $delimiter = ' ';
         $message = $request->object->message ?? null;
         $messageText = $message->text ?? null;
+
         $messageTextParts = is_string($messageText) ? explode($delimiter, $messageText) : [];
         $slashed = array_shift($messageTextParts);
         $payload = implode($delimiter, $messageTextParts);
@@ -78,9 +80,9 @@ abstract class Command
             } elseif ($isLazy) {
                 $commandClass = self::COMMANDS[self::COMMAND_LAZY];
             }
-            if (is_string($messageText) && !empty($messageText)) {
-                User::createMessage($database, $request, $messageText);
-            }
+        }
+        if (is_string($messageText) && !empty($messageText)) {
+            self::saveMessage($vkConfig, $database, $request, $messageText, $commandClass);
         }
 
         if ($commandClass !== null) {
@@ -93,6 +95,39 @@ abstract class Command
         }
 
         return null;
+    }
+
+    public static function saveMessage(
+        Config $vkConfig,
+        Database $database,
+        object $request,
+        string $text,
+        $commandClass = null
+    ): void {
+        try {
+            $payload = new Payload($request);
+            $user = User::findOne($database, $payload->getFromId());
+            if (null === $user) {
+                $response = new Response();
+                $jsonResponse = $response->send(
+                    $vkConfig,
+                    Message::METHOD_USERS_GET,
+                    ['user_ids' => $payload->getFromId()]
+                );
+
+                $user = json_decode($jsonResponse, true, 512, JSON_THROW_ON_ERROR);
+                $fullName = null;
+                if (!empty($user['response'][0]['first_name'])) {
+                    $fullName = trim($user['response'][0]['first_name'] . ' ' . ($user['response'][0]['last_name'] ?? null));
+                }
+                $user = User::createOne($database, $payload->getFromId(), $fullName);
+            }
+            if (null === $commandClass) {
+                $user->saveMessage($payload->getPeerId(), $text);
+            }
+        } catch (\Throwable $throwable) {
+            throw $throwable;
+        }
     }
 
     public function getMethod(): string

@@ -5,73 +5,93 @@ declare(strict_types = 1);
 namespace Teftely\Models;
 
 use Teftely\Components\Database;
-use Teftely\Components\Payload;
 
 class User extends Model
 {
     private int $id;
     private string $fromId;
-    private int $isAdmin;
+    private int $isAdmin = 0;
+    private ?string $fullName;
 
     private const STATUS_USER = 0;
     private const STATUS_MODER = 1;
     private const STATUS_ADMIN = 2;
 
-    public function findOrCreate(string $fromId, ?array $userData = null): self
+    public function assign($id, string $fromId, ?string $fullName = null, $isAdmin = 0): self
     {
-        $userData = $userData ?? $this->database->db()
-                ->select()
-                ->from('users')
-                ->where('from_id', '=', $fromId)
-                ->run()
-                ->fetch();
-
-        if (false === $userData) {
-            $table = $this->database->db()->table('users');
-            $id = $table->insertOne([
-                'from_id' => $fromId,
-            ]);
-
-            $this->id = $id;
-            $this->fromId = $fromId;
-            $this->isAdmin = 0;
-        } else {
-            $this->id = (int) $userData['id'];
-            $this->fromId = (string) $userData['from_id'];
-            $this->isAdmin = (int) $userData['is_admin'];
-        }
+        $this->id = (int) $id;
+        $this->fromId = $fromId;
+        $this->fullName = $fullName;
+        $this->isAdmin = (int) $isAdmin;
 
         return $this;
     }
 
-    public static function get(Database $database, string $fromId): self
+    public static function findOrCreate(Database $database, string $fromId): self
     {
-        $user = new self($database);
+        $user = self::findOne($database, $fromId);
+        if (null === $user) {
+            $user = self::createOne($database, $fromId, null);
+        }
 
-        return $user->findOrCreate($fromId);
+        return $user;
     }
 
-    public static function createMessage(Database $database, object $request, string $text): Message
+    public static function findOne(Database $database, ?string $fromId = null): ?self
     {
-        $payload = new Payload($request);
-        self::get($database, (string) $payload->getFromId());
+        if (null === $fromId) {
+            return null;
+        }
 
-        return Message::create(
-            $database,
-            $payload->getPeerId(),
-            $payload->getFromId(),
-            $text
-        );
+        $result = $database->db()
+            ->select()
+            ->from('users')
+            ->where('from_id', '=', $fromId)
+            ->run()
+            ->fetch();
+
+        if (!empty($result)) {
+            $user = new self($database);
+            $user->assign($result['id'], $result['from_id'], $result['full_name'], $result['is_admin']);
+
+            return $user;
+        }
+
+        return null;
+    }
+
+    public static function createOne(Database $database, string $fromId, ?string $fullName = null): self
+    {
+        $table = $database->db()->table('users');
+        $id = $table->insertOne([
+            'from_id' => $fromId,
+            'full_name' => $fullName ?? null,
+        ]);
+
+        $user = new self($database);
+        $user->assign($id, $fromId, $fullName);
+
+        return $user;
+    }
+
+    public function saveMessage($peerId, $text): void
+    {
+        Message::create($this->database, $peerId, $this->fromId, $text);
+    }
+
+    public function isUser(): bool
+    {
+        return $this->isAdmin === self::STATUS_USER;
     }
 
     public function isAdmin(): bool
     {
-        return $this->isAdmin === 2;
+        return $this->isAdmin === self::STATUS_ADMIN;
     }
 
     public function isModerator(): bool
     {
-        return $this->isAdmin !== 0;
+        return $this->isAdmin >= self::STATUS_MODER;
     }
 
     public function setAdmin(): self

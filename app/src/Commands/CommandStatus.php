@@ -12,7 +12,7 @@ class CommandStatus extends Command
 {
     public function run(Config $vkConfig, Database $database): void
     {
-        $peer = Peer::getOne($database, $this->payload->getPeerId());
+        $peer = Peer::findOrCreate($database, $this->payload->getPeerId());
 
         $message = $peer->isEnabled() ? 'Бот включен' : 'Бот отключен';
 

@@ -30,9 +30,9 @@ class Payload
         return $this->request->object->message->peer_id ?? $this->request->object->message->user_id;
     }
 
-    public function getFromId(): int
+    public function getFromId(): string
     {
-        return $this->request->object->message->from_id;
+        return (string) $this->request->object->message->from_id;
     }
 
     public function getMessage(): object

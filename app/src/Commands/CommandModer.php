@@ -12,7 +12,7 @@ class CommandModer extends Command
 {
     public function run(Config $vkConfig, Database $database): void
     {
-        $user = User::get($database, (string) $this->payload->getFromId());
+        $user = User::findOrCreate($database, $this->payload->getFromId());
 
         if ($this->payload->getPayload() === $vkConfig->get('password')) {
             $user->setModerator();

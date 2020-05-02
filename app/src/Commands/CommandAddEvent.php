@@ -13,13 +13,17 @@ class CommandAddEvent extends Command
 {
     public function run(Config $vkConfig, Database $database): void
     {
-        $user = User::get($database, (string) $this->payload->getFromId());
+        $user = User::findOrCreate($database, $this->payload->getFromId());
 
         if ($user->isAdmin()) {
             $message = "Некорректный формат добавления события. \n";
-            $message .= 'Ожидается [/add_event HH:mm"Название"Описание]';
-            if (false !== strpos($this->payload->getPayload(), '"')) {
-                [$time, $name, $text] = explode('"', $this->payload->getPayload());
+            $message .= "Ожидается [/add_event Название\nОписание\nВремя в формате ЧЧ:мм\nДень недели цифрой (понедельник 1)]";
+            if (false !== strpos($this->payload->getPayload(), "\n")) {
+                $data = explode("\n", $this->payload->getPayload());
+                $name = $data[0] ?? null;
+                $text = $data[1] ?? null;
+                $time = $data[2] ?? null;
+                $week = $data[3] ?? null;
                 if (!empty($time) && !empty($text)) {
                     $timeParts = explode(':', $time);
                     if (count($timeParts) !== 2
@@ -31,9 +35,9 @@ class CommandAddEvent extends Command
                         $time = null;
                     }
 
-                    $event = new Event($database);
-                    $event->findOrCreate(null, [
+                    $event = Event::findOrCreate($database, null, [
                         'time' => $time,
+                        'week' => $week,
                         'name' => $name,
                         'message' => $text,
                         'attachment' => $this->payload->getAttachment(),
