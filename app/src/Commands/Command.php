@@ -8,7 +8,6 @@ use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Components\Message;
 use Teftely\Components\Payload;
-use Wkhooy\ObsceneCensorRus;
 
 abstract class Command
 {
@@ -24,6 +23,7 @@ abstract class Command
     public const COMMAND_MODER = '/moder';
     public const COMMAND_OBSCENE = '/obscene';
     public const COMMAND_LAZY = '/lazy';
+    public const COMMAND_SORRY = '/sorry';
 
     public const COMMANDS = [
         self::COMMAND_HELP => CommandHelp::class,
@@ -38,6 +38,7 @@ abstract class Command
         self::COMMAND_MODER => CommandModer::class,
         self::COMMAND_OBSCENE => CommandObscene::class,
         self::COMMAND_LAZY => CommandLazy::class,
+        self::COMMAND_SORRY => CommandSorry::class,
     ];
 
     public const DESCRIPTIONS = [
@@ -47,7 +48,7 @@ abstract class Command
         self::COMMAND_TOGGLE => 'включить/отключить бота',
         self::COMMAND_SUBSCRIBE => 'подписаться на событие <ID>',
         self::COMMAND_UNSUBSCRIBE => 'отписаться от события <ID>',
-        self::COMMAND_ADD_EVENT => 'новое событие HH:mm;Название;Описание. Пример: /add_event 08:00;Парам-пам;Пора вставать и унывать',
+        self::COMMAND_ADD_EVENT => 'новое событие HH:mm"Название"Описание. Пример: /add_event 08:00"Парам-пам"Пора вставать и унывать',
         self::COMMAND_DEL_EVENT => 'удалить событие <ID>',
     ];
 
@@ -62,18 +63,21 @@ abstract class Command
         $message = $request->object->message ?? null;
 
         $messageText = $message->text ?? null;
-        $hasNoObscene = ObsceneCensorRus::isAllowed($messageText);
-        $hasNoObscene = (bool) random_int(0, (int) $hasNoObscene);
         $messageTextParts = is_string($messageText) ? explode($delimiter, $messageText) : [];
-
-        $slashed = $hasNoObscene ? array_shift($messageTextParts) : self::COMMAND_OBSCENE;
+        $slashed = array_shift($messageTextParts);
         $payload = implode($delimiter, $messageTextParts);
 
         $commandClass = null;
         if (isset(self::COMMANDS[$slashed])) {
             $commandClass = self::COMMANDS[$slashed];
-        } elseif (random_int(0, 1000) === 0) {
-            $commandClass = self::COMMANDS[self::COMMAND_LAZY];
+        } else {
+            $hasObscene = CommandObscene::check($messageText);
+            $isLazy = CommandLazy::check();
+            if ($hasObscene) {
+                $commandClass = self::COMMANDS[self::COMMAND_OBSCENE];
+            } elseif ($isLazy) {
+                $commandClass = self::COMMANDS[self::COMMAND_LAZY];
+            }
         }
 
         if ($commandClass !== null) {

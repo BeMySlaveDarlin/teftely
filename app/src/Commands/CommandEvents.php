@@ -22,9 +22,8 @@ class CommandEvents extends Command
             $eventId = $this->payload->getPayload();
             if (!empty($eventId) && is_numeric($eventId)) {
                 try {
-                    $message = "Ближайшее событие:\n";
                     $event = Event::getOne($database, (int) $eventId);
-                    $message .= $event->getFormattedMessage($peersEvents);
+                    $message = $event->getFormattedMessage($peersEvents);
 
                     $this->params['attachment'] = $event->getAttachment();
                 } catch (\Throwable $throwable) {

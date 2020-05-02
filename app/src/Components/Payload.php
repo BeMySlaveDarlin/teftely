@@ -20,6 +20,11 @@ class Payload
         return $this->payload;
     }
 
+    public function getConversationMessageId(): int
+    {
+        return $this->request->object->message->conversation_message_id;
+    }
+
     public function getPeerId(): int
     {
         return $this->request->object->message->peer_id ?? $this->request->object->message->user_id;
@@ -39,17 +44,20 @@ class Payload
     {
         $attachments = $this->request->object->message->attachments ?? null;
         if (is_array($attachments) || !empty($attachments[0])) {
-            $attachment = $attachments[0];
-            $type = $attachment->type;
-            $id = $attachment->$type->id ?? null;
-            $ownerId = $attachment->$type->owner_id ?? null;
-            $accessKey = $attachment->$type->access_key ?? null;
-            if (null !== $id) {
-                if (null !== $accessKey) {
-                    return "{$type}{$ownerId}_{$id}_($accessKey)";
-                }
+            $object = $attachments[0];
+            $type = $object->type;
+            $attachment = $object->$type ?? null;
+            if (null !== $attachment) {
+                $id = $attachment->id ?? null;
+                $ownerId = $attachment->owner_id ?? null;
+                $accessKey = $attachment->access_key ?? null;
+                if (null !== $id) {
+                    if (null !== $accessKey) {
+                        return "{$type}{$ownerId}_{$id}_{$accessKey}";
+                    }
 
-                return "{$type}{$ownerId}_{$id}";
+                    return "{$type}{$ownerId}_{$id}";
+                }
             }
         }
 

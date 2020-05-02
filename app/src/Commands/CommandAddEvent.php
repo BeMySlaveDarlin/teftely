@@ -17,9 +17,9 @@ class CommandAddEvent extends Command
 
         if ($user->isAdmin()) {
             $message = "Некорректный формат добавления события. \n";
-            $message .= 'Ожидается [/add_event HH:mm;Название;Описание]';
-            if (false !== strpos($this->payload->getPayload(), ';')) {
-                [$time, $name, $text] = explode(';', $this->payload->getPayload());
+            $message .= 'Ожидается [/add_event HH:mm"Название"Описание]';
+            if (false !== strpos($this->payload->getPayload(), '"')) {
+                [$time, $name, $text] = explode('"', $this->payload->getPayload());
                 if (!empty($time) && !empty($text)) {
                     $timeParts = explode(':', $time);
                     if (count($timeParts) !== 2

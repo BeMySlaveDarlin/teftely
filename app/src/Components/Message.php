@@ -17,11 +17,11 @@ class Message
         $this->request = $request;
     }
 
-    public function send(Config $vkConfig, Database $database, Response $response): string
+    public function send(Config $vkConfig, Database $database, Response $response): ?string
     {
         $command = Command::getCommand($vkConfig, $database, $this->request);
         if (null === $command) {
-            throw new \RuntimeException('Command not found');
+            return null;
         }
         $method = $command->getMethod();
         $params = $command->getParams();

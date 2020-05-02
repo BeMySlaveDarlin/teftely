@@ -6,7 +6,7 @@ namespace Teftely\Components;
 
 class Response
 {
-    public function send(Config $vkConfig, string $method, array $params): string
+    public function send(Config $vkConfig, string $method, array $params): ?string
     {
         $params['access_token'] = $vkConfig->get('access_token');
         $params['v'] = $vkConfig->get('api_version');
@@ -15,11 +15,12 @@ class Response
             throw new \RuntimeException("[$method] peer_id is not defined");
         }
 
-        $query = http_build_query($params);
-        $url = $vkConfig->get('api_endpoint') . $method . '?' . $query;
+        $url = $vkConfig->get('api_endpoint') . $method;
 
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
         $json = curl_exec($curl);
 
         $error = curl_error($curl);

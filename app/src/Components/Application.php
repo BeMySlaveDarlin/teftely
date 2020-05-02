@@ -35,7 +35,7 @@ class Application
 
             return $this->eventManager->getResponse($data);
         } catch (\Throwable $throwable) {
-            $this->logger->log(Logger::INFO, $throwable->getMessage());
+            $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
 
             return 'OK';
         }
@@ -59,16 +59,18 @@ class Application
                             'peer_id' => $event->getPeerId(),
                             'message' => $event->getMessage(),
                         ];
-                        if (null !== $event->getAttachment()) {
+                        if ($event->getAttachment()) {
                             $params['attachment'] = $event->getAttachment();
                         }
+                        $this->logger->log(Logger::INFO, 'sent event', $params);
                         $this->response->send($this->config->get(Config::VK_CONFIG), Message::METHOD_SEND, $params);
                     } catch (\Throwable $throwable) {
-                        $this->logger->log(Logger::INFO, $throwable->getMessage());
+                        $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
                     }
                 }
+                print 'All events sent' . PHP_EOL;
             } catch (\Throwable $throwable) {
-                $this->logger->log(Logger::INFO, $throwable->getMessage());
+                $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
             }
 
             sleep(60);
@@ -82,7 +84,7 @@ class Application
             $message = EventManager::unpack($argv[1]);
             $message->send($this->config->get(Config::VK_CONFIG), $this->database, $this->response);
         } catch (\Throwable $throwable) {
-            $this->logger->log(Logger::INFO, $throwable->getMessage());
+            $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
         }
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Teftely\Models;
 
-use Teftely\Commands\Command;
 use Teftely\Components\Database;
 
 class Event extends Model
@@ -26,7 +25,7 @@ class Event extends Model
             }
             $eventData = [
                 'name' => $eventData['name'] ?? (string) time(),
-                'message' => $eventData['message'],
+                'message' => base64_encode($eventData['message']),
                 'time' => $eventData['time'] ?? null,
                 'attachment' => $eventData['attachment'] ?? null,
             ];
@@ -36,8 +35,8 @@ class Event extends Model
             $this->name = $eventData['name'];
             $this->message = $eventData['message'];
             $this->time = $eventData['time'];
-            $this->attachment = $eventData['attachment'];
-            $this->peerId = $eventData['peer_id'] ?? null;
+            $this->attachment = null;
+            $this->peerId = null;
         } else {
             if ($eventId) {
                 $eventData = $this->database->db()
@@ -51,9 +50,9 @@ class Event extends Model
             if ($eventData) {
                 $this->id = (int) $eventData['id'];
                 $this->name = $eventData['name'];
-                $this->message = $eventData['message'];
+                $this->message = base64_decode($eventData['message']);
                 $this->time = $eventData['time'];
-                $this->attachment = $eventData['attachment'];
+                $this->attachment = $eventData['attachment'] ?? null;
                 $this->peerId = $eventData['peer_id'] ?? null;
             }
         }
@@ -81,17 +80,17 @@ class Event extends Model
 
     public function getTime(): string
     {
-        return null !== $this->time ? date('d.m.Y ') . substr($this->time, 0, -3) : 'Случайно';
+        return null !== $this->time ? date('d/m ') . substr($this->time, 0, -3) : '--';
     }
 
     public function getName(): string
     {
-        return (string) $this->name;
+        return $this->name;
     }
 
     public function getMessage(): string
     {
-        return $this->message;
+        return trim($this->message);
     }
 
     public function getAttachment(): ?string
@@ -106,17 +105,10 @@ class Event extends Model
 
     public function getFormattedMessage($peersEvents): string
     {
-        $message = "ID: {$this->getId()}\n";
-        $message .= "Событие: {$this->getName()}\n";
+        $statusId = "#{$this->getId()} " . (isset($peersEvents[$this->getId()]) ? '&#9989;' : '&#128683;');
+        $message = "\nСобытие: {$statusId} | {$this->getName()}\n";
         $message .= "Время: {$this->getTime()}\n";
-        $message .= "Описание: {$this->getMessage()}\n";
-        if (isset($peersEvents[$this->getId()])) {
-            $command = Command::COMMAND_UNSUBSCRIBE . ' ' . $this->getId();
-            $message .= "Статус: Активное. [$command] чтобы отключить \n\n";
-        } else {
-            $command = Command::COMMAND_SUBSCRIBE . ' ' . $this->getId();
-            $message .= "Статус: Отключено. [$command] чтобы включить \n\n";
-        }
+        $message .= "Описание: {$this->getMessage()}\n\n";
 
         return $message;
     }
