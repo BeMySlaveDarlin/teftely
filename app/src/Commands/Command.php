@@ -26,6 +26,7 @@ abstract class Command
     public const COMMAND_OBSCENE = '/obscene';
     public const COMMAND_LAZY = '/lazy';
     public const COMMAND_SORRY = '/sorry';
+    public const COMMAND_FORTUNE = '/fortune';
 
     public const COMMANDS = [
         self::COMMAND_HELP => CommandHelp::class,
@@ -41,6 +42,7 @@ abstract class Command
         self::COMMAND_OBSCENE => CommandObscene::class,
         self::COMMAND_LAZY => CommandLazy::class,
         self::COMMAND_SORRY => CommandSorry::class,
+        self::COMMAND_FORTUNE => CommandFortune::class,
     ];
 
     public const DESCRIPTIONS = [
@@ -75,10 +77,13 @@ abstract class Command
         } else {
             $hasObscene = CommandObscene::check($messageText);
             $isLazy = CommandLazy::check();
-            if ($hasObscene) {
-                $commandClass = self::COMMANDS[self::COMMAND_OBSCENE];
+            $isFortune = CommandFortune::check($messageText);
+            if ($isFortune) {
+                $commandClass = self::COMMANDS[self::COMMAND_FORTUNE];
             } elseif ($isLazy) {
                 $commandClass = self::COMMANDS[self::COMMAND_LAZY];
+            } elseif ($hasObscene) {
+                $commandClass = self::COMMANDS[self::COMMAND_OBSCENE];
             }
         }
         if (is_string($messageText) && !empty($messageText)) {

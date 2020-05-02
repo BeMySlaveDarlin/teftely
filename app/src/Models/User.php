@@ -79,6 +79,16 @@ class User extends Model
         Message::create($this->database, $peerId, $this->fromId, $text);
     }
 
+    public function getFullName(): ?string
+    {
+        return $this->fullName;
+    }
+
+    public function getName(): ?string
+    {
+        return explode(' ', (string) $this->fullName)[0] ?? 'Эй ты';
+    }
+
     public function isUser(): bool
     {
         return $this->isAdmin === self::STATUS_USER;
