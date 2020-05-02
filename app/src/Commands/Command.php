@@ -8,6 +8,7 @@ use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Components\Message;
 use Teftely\Components\Payload;
+use Teftely\Models\User;
 
 abstract class Command
 {
@@ -61,7 +62,6 @@ abstract class Command
     {
         $delimiter = ' ';
         $message = $request->object->message ?? null;
-
         $messageText = $message->text ?? null;
         $messageTextParts = is_string($messageText) ? explode($delimiter, $messageText) : [];
         $slashed = array_shift($messageTextParts);
@@ -77,6 +77,9 @@ abstract class Command
                 $commandClass = self::COMMANDS[self::COMMAND_OBSCENE];
             } elseif ($isLazy) {
                 $commandClass = self::COMMANDS[self::COMMAND_LAZY];
+            }
+            if (is_string($messageText) && !empty($messageText)) {
+                User::createMessage($database, $request, $messageText);
             }
         }
 

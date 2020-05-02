@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Teftely\Models;
 
 use Teftely\Components\Database;
+use Teftely\Components\Payload;
 
 class User extends Model
 {
@@ -48,6 +49,19 @@ class User extends Model
         $user = new self($database);
 
         return $user->findOrCreate($fromId);
+    }
+
+    public static function createMessage(Database $database, object $request, string $text): Message
+    {
+        $payload = new Payload($request);
+        self::get($database, (string) $payload->getFromId());
+
+        return Message::create(
+            $database,
+            $payload->getPeerId(),
+            $payload->getFromId(),
+            $text
+        );
     }
 
     public function isAdmin(): bool

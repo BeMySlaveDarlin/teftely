@@ -25,7 +25,7 @@ class Event extends Model
             }
             $eventData = [
                 'name' => $eventData['name'] ?? (string) time(),
-                'message' => base64_encode($eventData['message']),
+                'message' => $eventData['message'],
                 'time' => $eventData['time'] ?? null,
                 'attachment' => $eventData['attachment'] ?? null,
             ];
@@ -50,7 +50,7 @@ class Event extends Model
             if ($eventData) {
                 $this->id = (int) $eventData['id'];
                 $this->name = $eventData['name'];
-                $this->message = base64_decode($eventData['message']);
+                $this->message = $eventData['message'];
                 $this->time = $eventData['time'];
                 $this->attachment = $eventData['attachment'] ?? null;
                 $this->peerId = $eventData['peer_id'] ?? null;
@@ -80,7 +80,7 @@ class Event extends Model
 
     public function getTime(): string
     {
-        return null !== $this->time ? date('d/m ') . substr($this->time, 0, -3) : '--';
+        return null !== $this->time ? date('d.m.Y ') . substr($this->time, 0, -3) : '--';
     }
 
     public function getName(): string
@@ -105,10 +105,12 @@ class Event extends Model
 
     public function getFormattedMessage($peersEvents): string
     {
-        $statusId = "#{$this->getId()} " . (isset($peersEvents[$this->getId()]) ? '&#9989;' : '&#128683;');
-        $message = "\nСобытие: {$statusId} | {$this->getName()}\n";
+        $statusId = isset($peersEvents[$this->getId()]) ? '&#9989;' : '&#128721;';
+
+        $message = "Событие: #{$this->getId()} | {$this->getName()}\n";
+        $message .= "Описание: {$this->getMessage()}\n";
         $message .= "Время: {$this->getTime()}\n";
-        $message .= "Описание: {$this->getMessage()}\n\n";
+        $message .= "Статус: {$statusId}\n\n";
 
         return $message;
     }

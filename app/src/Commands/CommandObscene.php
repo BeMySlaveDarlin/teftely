@@ -19,7 +19,7 @@ class CommandObscene extends Command
         'Чай остывает, пока ты матюгаешься',
         'Ссаными тряпками из чата грязноротиков!',
         'Не матюгнешься - по попке не получишь...',
-        "Утро вечера...\nкак там это слово, а...\nХ#ЕВЕЕ",
+        "Утро вечера...\nкак там это слово, а...\nХ%ЕВЕЕ",
         'Захожу в чат, а вы снова о своем',
     ];
 
@@ -32,8 +32,8 @@ class CommandObscene extends Command
 
     public static function check(string $text): bool
     {
+        ObsceneCensorRus::$exceptions[] = 'бубля';
         return false === ObsceneCensorRus::isAllowed($text)
-            || false !== stripos(mb_strtolower($text), 'цаца')
-            || false !== stripos(mb_strtolower($text), 'цацы');
+            || false !== stripos(mb_strtolower($text), 'цац');
     }
 }
