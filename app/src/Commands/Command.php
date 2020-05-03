@@ -28,6 +28,7 @@ abstract class Command
     public const COMMAND_SORRY = '/sorry';
     public const COMMAND_FORTUNE = '/fortune';
     public const COMMAND_TOP = '/top';
+    public const COMMAND_SAY = '/say';
 
     public const COMMANDS = [
         self::COMMAND_HELP => CommandHelp::class,
@@ -45,6 +46,7 @@ abstract class Command
         self::COMMAND_SORRY => CommandSorry::class,
         self::COMMAND_FORTUNE => CommandFortune::class,
         self::COMMAND_TOP => CommandTop::class,
+        self::COMMAND_SAY => CommandSay::class,
     ];
 
     public const DESCRIPTIONS = [
