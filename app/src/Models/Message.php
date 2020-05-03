@@ -31,6 +31,18 @@ class Message extends Model
         return $message->assign($data);
     }
 
+    public static function total(Database $database, $peerId = null)
+    {
+        $query = $database->db()
+            ->select()
+            ->from('messages');
+        if (null !== $peerId) {
+            $query->where('peer_id', '=', $peerId);
+        }
+
+        return $query->count();
+    }
+
     public function assign(array $data): self
     {
         $this->id = $data['id'];

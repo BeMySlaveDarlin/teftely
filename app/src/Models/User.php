@@ -74,6 +74,22 @@ class User extends Model
         return $user;
     }
 
+    public static function topTalkers(Database $database, $peerId = null)
+    {
+        $query = $database->db()
+            ->select(['users.full_name', 'COUNT(messages.id) as msg'])
+            ->from('users')
+            ->innerJoin('messages')
+            ->on(['messages.from_id' => 'users.from_id'])
+            ->limit(5)
+            ->orderBy('msg', 'DESC');
+        if (null !== $peerId) {
+            $query->where('messages.peer_id', '=', $peerId);
+        }
+
+        return $query->groupBy('users.from_id')->fetchAll();
+    }
+
     public function saveMessage($peerId, $text): void
     {
         Message::create($this->database, $peerId, $this->fromId, $text);

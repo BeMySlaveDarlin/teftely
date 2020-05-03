@@ -27,6 +27,7 @@ abstract class Command
     public const COMMAND_LAZY = '/lazy';
     public const COMMAND_SORRY = '/sorry';
     public const COMMAND_FORTUNE = '/fortune';
+    public const COMMAND_TOP = '/top';
 
     public const COMMANDS = [
         self::COMMAND_HELP => CommandHelp::class,
@@ -43,6 +44,7 @@ abstract class Command
         self::COMMAND_LAZY => CommandLazy::class,
         self::COMMAND_SORRY => CommandSorry::class,
         self::COMMAND_FORTUNE => CommandFortune::class,
+        self::COMMAND_TOP => CommandTop::class,
     ];
 
     public const DESCRIPTIONS = [
@@ -54,6 +56,7 @@ abstract class Command
         self::COMMAND_UNSUBSCRIBE => 'отписаться от события <ID>',
         self::COMMAND_ADD_EVENT => 'добавить событие',
         self::COMMAND_DEL_EVENT => 'удалить событие <ID>',
+        self::COMMAND_TOP => 'топ болтушек',
     ];
 
     protected Payload $payload;
