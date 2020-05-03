@@ -150,8 +150,10 @@ class Event extends Model
         if (null !== $time) {
             $query->where('events.time', '=', $time);
         }
-        $query->where('peers_events.peer_id', '=', $peerId)
-            ->groupBy('peers_events.peer_id');
+        if (null !== $peerId) {
+            $query->where('peers_events.peer_id', '=', $peerId);
+        }
+        $query->groupBy('peers_events.peer_id');
 
         $peersEvents = [];
         $results = $query->groupBy('events.id')->fetchAll();
@@ -167,7 +169,7 @@ class Event extends Model
                     $result['attachment'],
                     $result['peer_id']
                 );
-                $peersEvents[$result['id']] = $event;
+                $peersEvents[$result['id']][$result['peer_id']] = $event;
             }
         }
 

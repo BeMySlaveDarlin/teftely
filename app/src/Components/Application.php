@@ -53,25 +53,28 @@ class Application
                 $foundPE = count($peersEvents);
                 print "Found {$foundPE} events" . PHP_EOL;
 
-                foreach ($peersEvents as $eventId => $event) {
-                    $eventWeek = $event->getWeek();
-                    if (null !== $eventWeek && $week !== $eventWeek) {
-                        print "Skipping event #$eventId: wrong weekday" . PHP_EOL;
-                        continue;
-                    }
-                    try {
-                        print "Sending event #$eventId" . PHP_EOL;
-                        $params = [
-                            'peer_id' => $event->getPeerId(),
-                            'message' => $event->getMessage(),
-                        ];
-                        if ($event->getAttachment()) {
-                            $params['attachment'] = $event->getAttachment();
+                foreach ($peersEvents as $eventId => $events) {
+                    foreach ($events as $peerId => $event) {
+                        try {
+                            $eventWeek = $event->getWeek();
+                            if (null !== $eventWeek && $week !== $eventWeek) {
+                                print "Skipping event #$eventId: wrong weekday" . PHP_EOL;
+                                continue;
+                            }
+
+                            print "Sending event #$eventId" . PHP_EOL;
+                            $params = [
+                                'peer_id' => $event->getPeerId(),
+                                'message' => $event->getMessage(),
+                            ];
+                            if ($event->getAttachment()) {
+                                $params['attachment'] = $event->getAttachment();
+                            }
+                            $this->response->send($this->config->get(Config::VK_CONFIG), Message::METHOD_SEND, $params);
+                            $this->logger->log(Logger::INFO, 'sent event', $params);
+                        } catch (\Throwable $throwable) {
+                            $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
                         }
-                        $this->logger->log(Logger::INFO, 'sent event', $params);
-                        $this->response->send($this->config->get(Config::VK_CONFIG), Message::METHOD_SEND, $params);
-                    } catch (\Throwable $throwable) {
-                        $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
                     }
                 }
                 print 'All events sent' . PHP_EOL;
