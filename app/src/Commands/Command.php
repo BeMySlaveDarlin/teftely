@@ -93,6 +93,7 @@ abstract class Command
         self::COMMAND_ADD_EVENT => 'добавить событие',
         self::COMMAND_DEL_EVENT => 'удалить событие <ID>',
         self::COMMAND_TOP => 'топ болтушек',
+        self::COMMAND_FORTUNE => 'гадалка, задай вопрос, ответ на который: ДА/НЕТ',
     ];
 
     protected Payload $payload;
@@ -116,7 +117,7 @@ abstract class Command
             $commandClass = self::COMMANDS[$commandWord];
             $isCommand = true;
         } else {
-            $reaction = Reaction::findOne($database, $commandWord);
+            $reaction = Reaction::findOne($database, $messageText);
             if (null !== $reaction && $reaction->isEnabled()) {
                 $isCommand = true;
                 $payload = $reaction->getCommand();

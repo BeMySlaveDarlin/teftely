@@ -19,7 +19,7 @@ class CommandDel extends Command
         if ($user->isAdmin()) {
             $reaction = Reaction::findOne($database, $this->payload->getPayload());
             if (null === $reaction) {
-                $message = "Команда [$this->payload->getPayload()] не существует";
+                $message = "Команда [{$this->payload->getPayload()}] не существует";
             } else {
                 $message = $reaction->delete()
                     ? "Команда [{$reaction->getCommand()}] удалена"
