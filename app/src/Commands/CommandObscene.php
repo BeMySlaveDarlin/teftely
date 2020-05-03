@@ -21,11 +21,13 @@ class CommandObscene extends Command
         'Не матюгнешься - по попке не получишь...',
         "Утро вечера...\nкак там это слово, а...\nХ%ЕВЕЕ",
         'Захожу в чат, а вы снова о своем',
+        'Пельмешек прикрой, бесстыдница!',
+        'Запихни свою цацу себе в цацу через цацу!',
     ];
 
     public function run(Config $vkConfig, Database $database): void
     {
-        $rnd = random_int(0, 9);
+        $rnd = random_int(0, count(self::MESSAGES));
         $this->params['peer_id'] = $this->payload->getPeerId();
         $this->params['message'] = self::MESSAGES[$rnd];
     }
