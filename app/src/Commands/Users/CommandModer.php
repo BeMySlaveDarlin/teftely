@@ -2,23 +2,24 @@
 
 declare(strict_types = 1);
 
-namespace Teftely\Commands;
+namespace Teftely\Commands\Users;
 
+use Teftely\Commands\Command;
 use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Models\User;
 
-class CommandAdmin extends Command
+class CommandModer extends Command
 {
     public function run(Config $vkConfig, Database $database): void
     {
         $user = User::findOrCreate($database, $this->payload->getFromId());
 
         if ($this->payload->getPayload() === $vkConfig->get('password')) {
-            $user->setAdmin();
-            $message = 'Вы получили права администратора';
+            $user->setModerator();
+            $message = 'Вы получили права модератора';
         } else {
-            $message = 'Для получения прав администратора требуется пароль';
+            $message = 'Для получения прав модератора требуется пароль';
         }
 
         $this->params['peer_id'] = $this->payload->getPeerId();

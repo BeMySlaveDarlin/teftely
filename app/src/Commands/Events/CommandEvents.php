@@ -2,8 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Teftely\Commands;
+namespace Teftely\Commands\Events;
 
+use Teftely\Commands\Command;
 use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Models\Event;

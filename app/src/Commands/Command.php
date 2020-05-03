@@ -4,6 +4,24 @@ declare(strict_types = 1);
 
 namespace Teftely\Commands;
 
+use Teftely\Commands\Bot\CommandSay;
+use Teftely\Commands\Bot\CommandSorry;
+use Teftely\Commands\Bot\CommandStatus;
+use Teftely\Commands\Bot\CommandToggle;
+use Teftely\Commands\Events\CommandAddEvent;
+use Teftely\Commands\Events\CommandDelEvent;
+use Teftely\Commands\Events\CommandEvents;
+use Teftely\Commands\Events\CommandSubscribe;
+use Teftely\Commands\Events\CommandUnsubscribe;
+use Teftely\Commands\Reactions\CommandAdd;
+use Teftely\Commands\Reactions\CommandDel;
+use Teftely\Commands\Reactions\CommandDisable;
+use Teftely\Commands\Reactions\CommandEnable;
+use Teftely\Commands\Reactions\CommandReaction;
+use Teftely\Commands\Reactions\CommandReactions;
+use Teftely\Commands\Users\CommandAdmin;
+use Teftely\Commands\Users\CommandModer;
+use Teftely\Commands\Users\CommandTop;
 use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Components\Message;

@@ -2,10 +2,12 @@
 
 declare(strict_types = 1);
 
-namespace Teftely\Commands;
+namespace Teftely\Commands\Reactions;
 
+use Teftely\Commands\Command;
 use Teftely\Components\Config;
 use Teftely\Components\Database;
+use Teftely\Models\Peer;
 use Teftely\Models\Reaction;
 use Teftely\Models\User;
 
@@ -15,8 +17,9 @@ class CommandReactions extends Command
     {
         $message = 'Нет доступных пользовательских команд';
         $user = User::findOrCreate($database, $this->payload->getFromId());
+        $peer = Peer::findOrCreate($database, $this->payload->getPeerId());
         $reactions = Reaction::findList($database, $user->isAdmin() ? null : Reaction::STATUS_ACTIVE);
-        if (!empty($reactions)) {
+        if (!empty($reactions) && $peer->isEnabled()) {
             $message = "Список пользовательских команд:\n\n";
             foreach ($reactions as $reaction) {
                 $message .= "Команда: {$reaction->getCommand()}\n";

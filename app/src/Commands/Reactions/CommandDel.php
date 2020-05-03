@@ -2,14 +2,15 @@
 
 declare(strict_types = 1);
 
-namespace Teftely\Commands;
+namespace Teftely\Commands\Reactions;
 
+use Teftely\Commands\Command;
 use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Models\Reaction;
 use Teftely\Models\User;
 
-class CommandEnable extends Command
+class CommandDel extends Command
 {
     public function run(Config $vkConfig, Database $database): void
     {
@@ -20,12 +21,12 @@ class CommandEnable extends Command
             if (null === $reaction) {
                 $message = "Команда [$this->payload->getPayload()] не существует";
             } else {
-                $message = $reaction->enable()
-                    ? "Команда [{$reaction->getCommand()}] включена"
-                    : "Команда [{$reaction->getCommand()}] не включена";
+                $message = $reaction->delete()
+                    ? "Команда [{$reaction->getCommand()}] удалена"
+                    : "Команда [{$reaction->getCommand()}] не удалена";
             }
         } else {
-            $message = 'Только админ может включать команды';
+            $message = 'Только админ может удалять команды';
         }
 
         $this->params['peer_id'] = $this->payload->getPeerId();

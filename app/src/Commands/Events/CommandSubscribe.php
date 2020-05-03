@@ -2,15 +2,16 @@
 
 declare(strict_types = 1);
 
-namespace Teftely\Commands;
+namespace Teftely\Commands\Events;
 
+use Teftely\Commands\Command;
 use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Models\Event;
 use Teftely\Models\Peer;
 use Teftely\Models\User;
 
-class CommandUnsubscribe extends Command
+class CommandSubscribe extends Command
 {
     public function run(Config $vkConfig, Database $database): void
     {
@@ -24,12 +25,12 @@ class CommandUnsubscribe extends Command
             /** @var Event $event */
             $event = $events[$eventId];
             $peerId = $peer->getPeerId();
-            if (isset($peersEvents[$eventId])) {
-                $event->disable($peerId);
+            if (!isset($peersEvents[$eventId])) {
+                $event->enable($peerId);
             }
-            $message = "Событие #$eventId отключено";
+            $message = "Событие #$eventId включено";
         } else {
-            $message = 'Только админ или модел может переключать события в чате';
+            $message = 'Только админ или модер может переключать события в чате';
         }
 
         $this->params['peer_id'] = $this->payload->getPeerId();
