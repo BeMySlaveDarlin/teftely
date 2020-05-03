@@ -75,9 +75,9 @@ abstract class Command
         if (isset(self::COMMANDS[$slashed])) {
             $commandClass = self::COMMANDS[$slashed];
         } else {
-            $hasObscene = CommandObscene::check($messageText);
             $isLazy = CommandLazy::check();
             $isFortune = CommandFortune::check($messageText);
+            $hasObscene = CommandObscene::check($messageText);
             if ($isFortune) {
                 $commandClass = self::COMMANDS[self::COMMAND_FORTUNE];
             } elseif ($isLazy) {

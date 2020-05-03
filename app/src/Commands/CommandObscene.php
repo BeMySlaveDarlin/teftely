@@ -33,7 +33,12 @@ class CommandObscene extends Command
     public static function check(string $text): bool
     {
         ObsceneCensorRus::$exceptions[] = 'бубля';
-        return false === ObsceneCensorRus::isAllowed($text)
-            || false !== stripos(mb_strtolower($text), 'цац');
+        $isObscene = false === ObsceneCensorRus::isAllowed($text);
+        if ($isObscene) {
+            $isObscene = false === (bool) random_int(0, 10);
+        }
+        $isCaca = false !== stripos(mb_strtolower($text), 'цац');
+
+        return $isObscene || $isCaca;
     }
 }

@@ -37,7 +37,7 @@ class Event extends Model
         return $this;
     }
 
-    public static function findOrCreate(Database $database, ?int $eventId = null, ?array $eventData = []): self
+    public static function findOrCreate(Database $database, ?string $eventId = null, ?array $eventData = []): self
     {
         $event = self::findOne($database, $eventId ?? $eventData['id']);
         if (null === $event) {
@@ -47,7 +47,7 @@ class Event extends Model
         return $event;
     }
 
-    public static function findOne(Database $database, ?int $eventId = null): ?self
+    public static function findOne(Database $database, ?string $eventId = null): ?self
     {
         if (null === $eventId) {
             return null;
@@ -65,7 +65,7 @@ class Event extends Model
             $event->assign(
                 $result['id'],
                 $result['name'],
-                $result['message'],
+                ($result['message']),
                 $result['time'],
                 $result['week'],
                 $result['attachment']
@@ -89,7 +89,7 @@ class Event extends Model
         }
         $eventData = [
             'name' => $eventData['name'] ?? (string) time(),
-            'message' => $eventData['message'],
+            'message' => ($eventData['message']),
             'time' => $eventData['time'] ?? null,
             'week' => $eventData['week'] ?? null,
             'attachment' => $eventData['attachment'] ?? null,
@@ -100,7 +100,7 @@ class Event extends Model
         $event->assign(
             $id,
             $eventData['name'],
-            $eventData['message'],
+            ($eventData['message']),
             $eventData['time'],
             $eventData['week'],
             $eventData['attachment'],
@@ -125,7 +125,7 @@ class Event extends Model
                 $event->assign(
                     $result['id'],
                     $result['name'],
-                    $result['message'],
+                    ($result['message']),
                     $result['time'],
                     $result['week'],
                     $result['attachment']
@@ -163,7 +163,7 @@ class Event extends Model
                 $event->assign(
                     $result['id'],
                     $result['name'],
-                    $result['message'],
+                    ($result['message']),
                     $result['time'],
                     $result['week'],
                     $result['attachment'],

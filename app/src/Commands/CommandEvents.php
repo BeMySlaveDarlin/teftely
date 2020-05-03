@@ -22,7 +22,7 @@ class CommandEvents extends Command
             $eventId = $this->payload->getPayload();
             if (!empty($eventId) && is_numeric($eventId)) {
                 try {
-                    $event = Event::findOne($database, (int) $eventId);
+                    $event = Event::findOne($database, $eventId);
                     if (null === $event) {
                         $message = "Событие #{$eventId} не существует";
                     } else {
