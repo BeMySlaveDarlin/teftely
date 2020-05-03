@@ -9,6 +9,7 @@ use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Models\Event;
 use Teftely\Models\Peer;
+use Throwable;
 
 class CommandEvents extends Command
 {
@@ -31,7 +32,7 @@ class CommandEvents extends Command
                     }
 
                     $this->params['attachment'] = $event->getAttachment();
-                } catch (\Throwable $throwable) {
+                } catch (Throwable $throwable) {
                     $message = "Событие #$eventId не найдено";
                 }
             } else {

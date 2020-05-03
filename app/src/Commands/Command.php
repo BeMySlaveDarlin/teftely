@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Teftely\Commands;
 
+use Teftely\Commands\Bot\CommandLazy;
 use Teftely\Commands\Bot\CommandRandom;
 use Teftely\Commands\Bot\CommandSay;
 use Teftely\Commands\Bot\CommandSorry;
@@ -30,6 +31,7 @@ use Teftely\Components\Payload;
 use Teftely\Components\Response;
 use Teftely\Models\Reaction;
 use Teftely\Models\User;
+use Throwable;
 
 abstract class Command
 {
@@ -176,7 +178,7 @@ abstract class Command
             if (false === $commandClass) {
                 $user->saveMessage($payload->getPeerId(), $text);
             }
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             throw $throwable;
         }
     }

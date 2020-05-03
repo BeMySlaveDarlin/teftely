@@ -4,6 +4,9 @@ declare(strict_types = 1);
 
 namespace Teftely\Components;
 
+use RuntimeException;
+use Throwable;
+
 class Response
 {
     public function send(Config $vkConfig, string $method, array $params): ?string
@@ -25,16 +28,16 @@ class Response
 
         $error = curl_error($curl);
         if ($error) {
-            throw new \RuntimeException("Failed [$method] request: $error");
+            throw new RuntimeException("Failed [$method] request: $error");
         }
 
         curl_close($curl);
         try {
             $response = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
             if (!$response || !isset($response['response'])) {
-                throw new \RuntimeException("Invalid response for [$method] request: $json");
+                throw new RuntimeException("Invalid response for [$method] request: $json");
             }
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             throw $throwable;
         }
 

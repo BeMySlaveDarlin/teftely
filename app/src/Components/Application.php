@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Teftely\Components;
 
 use Teftely\Models\Event;
+use Throwable;
 
 class Application
 {
@@ -34,7 +35,7 @@ class Application
             $this->eventManager->createMessage($data);
 
             return $this->eventManager->getResponse($data);
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
 
             return 'OK';
@@ -72,13 +73,13 @@ class Application
                             }
                             $this->response->send($this->config->get(Config::VK_CONFIG), Message::METHOD_SEND, $params);
                             $this->logger->log(Logger::INFO, 'sent event', $params);
-                        } catch (\Throwable $throwable) {
+                        } catch (Throwable $throwable) {
                             $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
                         }
                     }
                 }
                 print 'All events sent' . PHP_EOL;
-            } catch (\Throwable $throwable) {
+            } catch (Throwable $throwable) {
                 $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
             }
 
@@ -95,7 +96,7 @@ class Application
             if (!empty($response)) {
                 $this->logger->log(Logger::INFO, $response);
             }
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
         }
     }

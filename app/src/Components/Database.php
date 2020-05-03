@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Teftely\Components;
 
+use PDO;
 use Spiral\Database\Config\DatabaseConfig;
 use Spiral\Database\DatabaseInterface;
 use Spiral\Database\DatabaseManager;
@@ -31,7 +32,7 @@ class Database
                         'connection' => "mysql:host=$host;dbname=$dbName",
                         'username' => $config->get('user'),
                         'password' => $config->get('password'),
-                        \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
+                        PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
                     ],
                 ],
             ],

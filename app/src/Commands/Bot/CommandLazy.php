@@ -2,8 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Teftely\Commands;
+namespace Teftely\Commands\Bot;
 
+use Teftely\Commands\Command;
 use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Models\Message;
@@ -12,7 +13,7 @@ class CommandLazy extends Command
 {
     public function run(Config $vkConfig, Database $database): void
     {
-        $rnd = random_int(0, 1);
+        $rnd = random_int(0, 5);
         $this->params['peer_id'] = $this->payload->getPeerId();
         $this->params['message'] = $rnd
             ? Message::findRandom($database) :

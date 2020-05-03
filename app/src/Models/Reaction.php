@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Teftely\Models;
 
+use RuntimeException;
 use Teftely\Components\Database;
 
 class Reaction extends Model
@@ -70,7 +71,7 @@ class Reaction extends Model
     public static function createOne(Database $database, ?string $command = null, ?array $reactionData = null): self
     {
         if (null === $reactionData && null === $command) {
-            throw new \RuntimeException('Cannot create reaction');
+            throw new RuntimeException('Cannot create reaction');
         }
 
         $table = $database->db()->table('reactions');
