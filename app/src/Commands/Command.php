@@ -71,9 +71,11 @@ abstract class Command
         $slashed = array_shift($messageTextParts);
         $payload = implode($delimiter, $messageTextParts);
 
+        $isCommand = false;
         $commandClass = null;
         if (isset(self::COMMANDS[$slashed])) {
             $commandClass = self::COMMANDS[$slashed];
+            $isCommand = true;
         } else {
             $isLazy = CommandLazy::check();
             $isFortune = CommandFortune::check($messageText);
@@ -87,7 +89,7 @@ abstract class Command
             }
         }
         if (is_string($messageText) && !empty($messageText)) {
-            self::saveMessage($vkConfig, $database, $request, $messageText, $commandClass);
+            self::saveMessage($vkConfig, $database, $request, $messageText, $isCommand);
         }
 
         if ($commandClass !== null) {
@@ -107,7 +109,7 @@ abstract class Command
         Database $database,
         object $request,
         string $text,
-        $commandClass = null
+        $commandClass = false
     ): void {
         try {
             $payload = new Payload($request);
@@ -127,7 +129,7 @@ abstract class Command
                 }
                 $user = User::createOne($database, $payload->getFromId(), $fullName);
             }
-            if (null === $commandClass) {
+            if (false === $commandClass) {
                 $user->saveMessage($payload->getPeerId(), $text);
             }
         } catch (\Throwable $throwable) {
