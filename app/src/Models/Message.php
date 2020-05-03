@@ -31,6 +31,17 @@ class Message extends Model
         return $message->assign($data);
     }
 
+    public static function findRandom(Database $database): string
+    {
+        $query = $database->db()
+            ->select(['message'])
+            ->from('messages')
+            ->orderBy('RAND()')
+            ->limit(1);
+
+        return $query->run()->fetchColumn();
+    }
+
     public static function total(Database $database, $peerId = null)
     {
         $query = $database->db()

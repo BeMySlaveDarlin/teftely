@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Teftely\Commands;
 
+use Teftely\Commands\Bot\CommandRandom;
 use Teftely\Commands\Bot\CommandSay;
 use Teftely\Commands\Bot\CommandSorry;
 use Teftely\Commands\Bot\CommandStatus;

@@ -37,7 +37,7 @@ class CommandObscene extends Command
         ObsceneCensorRus::$exceptions[] = 'бубля';
         $isObscene = false === ObsceneCensorRus::isAllowed($text);
         if ($isObscene) {
-            $isObscene = false === (bool) random_int(0, 10);
+            $isObscene = false === (bool) random_int(0, 20);
         }
         $isCaca = false !== stripos(mb_strtolower($text), 'цац');
 
