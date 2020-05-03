@@ -124,10 +124,12 @@ class User extends Model
     {
         if (isset($this->id)) {
             $this->database->db()->table('users')
-                ->update(['is_admin' => 2])
+                ->update(['is_admin' => self::STATUS_ADMIN])
                 ->where('id', '=', $this->id)
                 ->run();
         }
+
+        $this->isAdmin = self::STATUS_ADMIN;
 
         return $this;
     }
@@ -136,10 +138,26 @@ class User extends Model
     {
         if (isset($this->id)) {
             $this->database->db()->table('users')
-                ->update(['is_admin' => 1])
+                ->update(['is_admin' => self::STATUS_MODER])
                 ->where('id', '=', $this->id)
                 ->run();
         }
+
+        $this->isAdmin = self::STATUS_MODER;
+
+        return $this;
+    }
+
+    public function setUser(): self
+    {
+        if (isset($this->id)) {
+            $this->database->db()->table('users')
+                ->update(['is_admin' => self::STATUS_USER])
+                ->where('id', '=', $this->id)
+                ->run();
+        }
+
+        $this->isAdmin = self::STATUS_USER;
 
         return $this;
     }

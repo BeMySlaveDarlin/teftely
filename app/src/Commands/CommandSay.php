@@ -13,6 +13,6 @@ class CommandSay extends Command
     {
         $rnd = random_int(0, 100);
         $this->params['peer_id'] = $this->payload->getPeerId();
-        $this->params['message'] = $rnd === 0 ? 'лень' : $this->payload->getPayload();
+        $this->params['message'] = $rnd === 0 ? 'чот лень повторять' : $this->payload->getPayload();
     }
 }

@@ -9,6 +9,7 @@ use Teftely\Components\Database;
 use Teftely\Components\Message;
 use Teftely\Components\Payload;
 use Teftely\Components\Response;
+use Teftely\Models\Reaction;
 use Teftely\Models\User;
 
 abstract class Command
@@ -29,6 +30,12 @@ abstract class Command
     public const COMMAND_FORTUNE = '/fortune';
     public const COMMAND_TOP = '/top';
     public const COMMAND_SAY = '/say';
+    public const COMMAND_ADD = '/add';
+    public const COMMAND_DEL = '/del';
+    public const COMMAND_COMMAND = '/command';
+    public const COMMAND_COMMANDS = '/commands';
+    public const COMMAND_ENABLE = '/enable';
+    public const COMMAND_DISABLE = '/disable';
 
     public const COMMANDS = [
         self::COMMAND_HELP => CommandHelp::class,
@@ -47,6 +54,12 @@ abstract class Command
         self::COMMAND_FORTUNE => CommandFortune::class,
         self::COMMAND_TOP => CommandTop::class,
         self::COMMAND_SAY => CommandSay::class,
+        self::COMMAND_ADD => CommandAdd::class,
+        self::COMMAND_DEL => CommandDel::class,
+        self::COMMAND_COMMAND => CommandReaction::class,
+        self::COMMAND_ENABLE => CommandEnable::class,
+        self::COMMAND_DISABLE => CommandDisable::class,
+        self::COMMAND_COMMANDS => CommandReactions::class,
     ];
 
     public const DESCRIPTIONS = [
@@ -73,24 +86,31 @@ abstract class Command
         $messageText = $message->text ?? null;
 
         $messageTextParts = is_string($messageText) ? explode($delimiter, $messageText) : [];
-        $slashed = array_shift($messageTextParts);
+        $commandWord = array_shift($messageTextParts);
         $payload = implode($delimiter, $messageTextParts);
 
         $isCommand = false;
         $commandClass = null;
-        if (isset(self::COMMANDS[$slashed])) {
-            $commandClass = self::COMMANDS[$slashed];
+        if (isset(self::COMMANDS[$commandWord])) {
+            $commandClass = self::COMMANDS[$commandWord];
             $isCommand = true;
         } else {
-            $isLazy = CommandLazy::check();
-            $isFortune = CommandFortune::check($messageText);
-            $hasObscene = CommandObscene::check($messageText);
-            if ($isFortune) {
-                $commandClass = self::COMMANDS[self::COMMAND_FORTUNE];
-            } elseif ($isLazy) {
-                $commandClass = self::COMMANDS[self::COMMAND_LAZY];
-            } elseif ($hasObscene) {
-                $commandClass = self::COMMANDS[self::COMMAND_OBSCENE];
+            $reaction = Reaction::findOne($database, $commandWord);
+            if (null !== $reaction && $reaction->isEnabled()) {
+                $isCommand = true;
+                $payload = $reaction->getCommand();
+                $commandClass = self::COMMANDS[self::COMMAND_COMMAND];
+            } else {
+                $isLazy = CommandLazy::check();
+                $isFortune = CommandFortune::check($messageText);
+                $hasObscene = CommandObscene::check($messageText);
+                if ($isFortune) {
+                    $commandClass = self::COMMANDS[self::COMMAND_FORTUNE];
+                } elseif ($isLazy) {
+                    $commandClass = self::COMMANDS[self::COMMAND_LAZY];
+                } elseif ($hasObscene) {
+                    $commandClass = self::COMMANDS[self::COMMAND_OBSCENE];
+                }
             }
         }
         if (is_string($messageText) && !empty($messageText)) {

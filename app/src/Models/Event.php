@@ -65,7 +65,7 @@ class Event extends Model
             $event->assign(
                 $result['id'],
                 $result['name'],
-                ($result['message']),
+                $result['message'],
                 $result['time'],
                 $result['week'],
                 $result['attachment']
@@ -125,7 +125,7 @@ class Event extends Model
                 $event->assign(
                     $result['id'],
                     $result['name'],
-                    ($result['message']),
+                    $result['message'],
                     $result['time'],
                     $result['week'],
                     $result['attachment']
@@ -163,7 +163,7 @@ class Event extends Model
                 $event->assign(
                     $result['id'],
                     $result['name'],
-                    ($result['message']),
+                    $result['message'],
                     $result['time'],
                     $result['week'],
                     $result['attachment'],
