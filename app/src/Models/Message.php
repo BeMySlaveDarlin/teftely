@@ -31,11 +31,12 @@ class Message extends Model
         return $message->assign($data);
     }
 
-    public static function findRandom(Database $database): string
+    public static function findRandom(Database $database, $peerId): string
     {
         $query = $database->db()
             ->select(['message'])
             ->from('messages')
+            ->where('peer_id', '=', $peerId)
             ->orderBy('RAND()')
             ->limit(1);
 
