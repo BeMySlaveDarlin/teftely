@@ -64,6 +64,38 @@ class Payload
         return null;
     }
 
+    public function getPhotoUrl(): ?string
+    {
+        $attachments = $this->request->object->message->attachments ?? null;
+        if (is_array($attachments) || !empty($attachments[0])) {
+            $object = $attachments[0];
+            $type = $object->type;
+            if ($type === 'photo') {
+                $attachment = $object->$type ?? null;
+                if (null !== $attachment) {
+                    $images = $attachment->sizes;
+                    if (!empty($images)) {
+                        $images = (array) $images;
+                        $biggest = json_decode(
+                            json_encode(
+                                array_pop($images),
+                                JSON_THROW_ON_ERROR,
+                                512
+                            ),
+                            false,
+                            512,
+                            JSON_THROW_ON_ERROR
+                        );
+
+                        return $biggest->url ?? null;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public function getSecret(): string
     {
         return $this->request->secret;

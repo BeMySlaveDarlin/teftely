@@ -28,17 +28,24 @@ class Application
         $this->eventManager = new EventManager($config);
     }
 
-    public function handle(): string
+    public function handle(): ?string
     {
-        try {
-            $data = $this->request->getData();
-            $this->eventManager->createMessage($data);
+        $url = $this->request->get('_url');
+        if ($url === '/webhook') {
+            try {
+                $data = $this->request->getData();
+                $this->eventManager->createMessage($data);
 
-            return $this->eventManager->getResponse($data);
-        } catch (Throwable $throwable) {
-            $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
+                return $this->eventManager->getResponse($data);
+            } catch (Throwable $throwable) {
+                $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
 
-            return 'OK';
+                return 'OK';
+            }
+        } else {
+            include BASE_PATH . 'template/layout.php';
+
+            return null;
         }
     }
 

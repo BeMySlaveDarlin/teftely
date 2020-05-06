@@ -9,7 +9,6 @@ use Teftely\Components\Database;
 class Event extends Model
 {
     private int $id;
-    private string $code;
     private string $name;
     private string $message;
     private ?string $time;
@@ -89,7 +88,7 @@ class Event extends Model
         }
         $eventData = [
             'name' => $eventData['name'] ?? (string) time(),
-            'message' => ($eventData['message']),
+            'message' => $eventData['message'],
             'time' => $eventData['time'] ?? null,
             'week' => $eventData['week'] ?? null,
             'attachment' => $eventData['attachment'] ?? null,
@@ -100,7 +99,7 @@ class Event extends Model
         $event->assign(
             $id,
             $eventData['name'],
-            ($eventData['message']),
+            $eventData['message'],
             $eventData['time'],
             $eventData['week'],
             $eventData['attachment'],
@@ -184,11 +183,6 @@ class Event extends Model
     public function getId(): ?int
     {
         return $this->id ?? null;
-    }
-
-    public function getCode(): string
-    {
-        return $this->code;
     }
 
     public function getTime(): string
