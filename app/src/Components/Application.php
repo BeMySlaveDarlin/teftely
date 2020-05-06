@@ -54,7 +54,7 @@ class Application
         do {
             try {
                 $time = date('H:i:00', strtotime('+3 hours'));
-                $week = (string) (date('w') + 1);
+                $week = (string) date('w');
                 print "Sending events for time $time" . PHP_EOL;
 
                 $peersEvents = Event::findListActive($this->database, $time);
