@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace Teftely\Commands;
 
-use Teftely\Commands\Bot\CommandLazy;
-use Teftely\Commands\Bot\CommandRandom;
 use Teftely\Commands\Bot\CommandSay;
 use Teftely\Commands\Bot\CommandSorry;
 use Teftely\Commands\Bot\CommandStatus;
@@ -46,7 +44,6 @@ abstract class Command
     public const COMMAND_ADMIN = '/admin';
     public const COMMAND_MODER = '/moder';
     public const COMMAND_OBSCENE = '/obscene';
-    public const COMMAND_LAZY = '/lazy';
     public const COMMAND_SORRY = '/sorry';
     public const COMMAND_FORTUNE = '/fortune';
     public const COMMAND_TOP = '/top';
@@ -70,7 +67,6 @@ abstract class Command
         self::COMMAND_ADMIN => CommandAdmin::class,
         self::COMMAND_MODER => CommandModer::class,
         self::COMMAND_OBSCENE => CommandObscene::class,
-        self::COMMAND_LAZY => CommandLazy::class,
         self::COMMAND_SORRY => CommandSorry::class,
         self::COMMAND_FORTUNE => CommandFortune::class,
         self::COMMAND_TOP => CommandTop::class,
@@ -123,13 +119,10 @@ abstract class Command
                 $payload = $reaction->getCommand();
                 $commandClass = self::COMMANDS[self::COMMAND_COMMAND];
             } else {
-                $isLazy = CommandLazy::check();
                 $isFortune = CommandFortune::check($messageText);
                 $hasObscene = CommandObscene::check($messageText);
                 if ($isFortune) {
                     $commandClass = self::COMMANDS[self::COMMAND_FORTUNE];
-                } elseif ($isLazy) {
-                    $commandClass = self::COMMANDS[self::COMMAND_LAZY];
                 } elseif ($hasObscene) {
                     $commandClass = self::COMMANDS[self::COMMAND_OBSCENE];
                 }
