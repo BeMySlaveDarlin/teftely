@@ -13,7 +13,6 @@ class Chapter extends Model
     private int $id;
     private string $fromId;
     private string $chapter;
-    private ?string $photo;
     private int $status = self::STATUS_PENDING;
 
     public const STATUS_PUBLISHED = 1;
@@ -23,14 +22,12 @@ class Chapter extends Model
         $id,
         string $fromId,
         string $chapter,
-        ?string $photo = null,
         $status = self::STATUS_PENDING
     ): self {
         $this->id = (int) $id;
         $this->fromId = $fromId;
         $this->chapter = $chapter;
         $this->status = (int) $status;
-        $this->photo = $photo;
 
         return $this;
     }
@@ -64,7 +61,6 @@ class Chapter extends Model
                 $result['id'],
                 $result['from_id'],
                 $result['chapter'],
-                $result['photo'],
                 $result['status']
             );
 
@@ -72,6 +68,31 @@ class Chapter extends Model
         }
 
         return null;
+    }
+
+    public static function findList(Database $database): array
+    {
+        $chapters = [];
+        $results = $database->db()
+            ->select()
+            ->from('story_chapters')
+            ->where('status', '=', 1)
+            ->fetchAll();
+
+        if ($results) {
+            foreach ($results as $result) {
+                $chapter = new self($database);
+                $chapter->assign(
+                    $result['id'],
+                    $result['from_id'],
+                    $result['chapter'],
+                    $result['status']
+                );
+                $chapters[] = $chapter;
+            }
+        }
+
+        return $chapters;
     }
 
     public static function createOne(Database $database, array $chapterData): ?self
@@ -87,8 +108,7 @@ class Chapter extends Model
         $chapter->assign(
             $id,
             $chapterData['from_id'],
-            $chapterData['chapter'],
-            $chapterData['photo']
+            $chapterData['chapter']
         );
 
         return $chapter;
@@ -99,19 +119,19 @@ class Chapter extends Model
         return $this->id ?? null;
     }
 
-    public function getAuthor(): User
+    public function getAuthor(): string
     {
-        return User::findOne($this->database, $this->fromId);
+        $user = User::findOne($this->database, $this->fromId);
+        if (null !== $user) {
+            return $user->getFullName();
+        }
+
+        return 'Неизвестный';
     }
 
     public function getChapter(): string
     {
         return $this->chapter;
-    }
-
-    public function getPhoto(): ?string
-    {
-        return $this->photo;
     }
 
     public function getVotes(): ?array

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Teftely\Components;
 
 use Teftely\Models\Event;
+use Teftely\Models\Story\Chapter;
 use Throwable;
 
 class Application
@@ -43,6 +44,21 @@ class Application
                 return 'OK';
             }
         } else {
+            $chapters = Chapter::findList($this->database);
+
+            $pages = [];
+            $page = 1;
+            $pageText = '';
+            foreach ($chapters as $chapter) {
+                if (mb_strlen($pageText) >= 1000) {
+                    $pageText = '';
+                    $page++;
+                }
+                $pageText .= $chapter->getChapter();
+                $pages[$page][] = $chapter;
+            }
+
+            header('Content-Type: text/html');
             include BASE_PATH . 'template/layout.php';
 
             return null;
