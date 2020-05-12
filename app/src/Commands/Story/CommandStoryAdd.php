@@ -14,7 +14,7 @@ use Teftely\Models\User;
 class CommandStoryAdd extends Command
 {
     public const MIN_LENGTH = 100;
-    public const MAX_LENGTH = 350;
+    public const MAX_LENGTH = 400;
 
     public function run(Config $vkConfig, Database $database): void
     {
