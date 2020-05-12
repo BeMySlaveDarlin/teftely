@@ -19,6 +19,12 @@ use Teftely\Commands\Reactions\CommandDisable;
 use Teftely\Commands\Reactions\CommandEnable;
 use Teftely\Commands\Reactions\CommandReaction;
 use Teftely\Commands\Reactions\CommandReactions;
+use Teftely\Commands\Story\CommandStory;
+use Teftely\Commands\Story\CommandStoryAdd;
+use Teftely\Commands\Story\CommandStoryDel;
+use Teftely\Commands\Story\CommandStoryLast;
+use Teftely\Commands\Story\CommandStoryVoteDown;
+use Teftely\Commands\Story\CommandStoryVoteUp;
 use Teftely\Commands\Users\CommandAdmin;
 use Teftely\Commands\Users\CommandModer;
 use Teftely\Commands\Users\CommandTop;
@@ -33,63 +39,78 @@ use Throwable;
 
 abstract class Command
 {
-    public const COMMAND_HELP = '/help';
-    public const COMMAND_EVENTS = '/events';
+    //Bot related commands
+    public const COMMAND_SAY = '/say';
+    public const COMMAND_SORRY = '/sorry';
     public const COMMAND_STATUS = '/status';
     public const COMMAND_TOGGLE = '/toggle';
-    public const COMMAND_SUBSCRIBE = '/sub_event';
-    public const COMMAND_UNSUBSCRIBE = '/unsub_event';
+
+    //Events related commands
+    public const COMMAND_EVENTS = '/events';
     public const COMMAND_ADD_EVENT = '/add_event';
     public const COMMAND_DEL_EVENT = '/del_event';
-    public const COMMAND_ADMIN = '/admin';
-    public const COMMAND_MODER = '/moder';
-    public const COMMAND_OBSCENE = '/obscene';
-    public const COMMAND_SORRY = '/sorry';
-    public const COMMAND_FORTUNE = '/fortune';
-    public const COMMAND_TOP = '/top';
-    public const COMMAND_SAY = '/say';
+    public const COMMAND_SUBSCRIBE = '/sub_event';
+    public const COMMAND_UNSUBSCRIBE = '/unsub_event';
+
+    //Reactions related commands
     public const COMMAND_ADD = '/add';
     public const COMMAND_DEL = '/del';
-    public const COMMAND_COMMAND = '/command';
-    public const COMMAND_COMMANDS = '/commands';
     public const COMMAND_ENABLE = '/enable';
     public const COMMAND_DISABLE = '/disable';
+    public const COMMAND_COMMAND = '/command';
+    public const COMMAND_COMMANDS = '/commands';
+
+    //Story related commands
+    public const COMMAND_STORY = '/story';
+    public const COMMAND_STORY_ADD = '/story_add';
+    public const COMMAND_STORY_DEL = '/story_del';
+    public const COMMAND_STORY_UP = '/story_up';
+    public const COMMAND_STORY_DOWN = '/story_down';
+    public const COMMAND_STORY_LAST = '/story_last';
+
+    //User related commands
+    public const COMMAND_TOP = '/top';
+    public const COMMAND_ADMIN = '/admin';
+    public const COMMAND_MODER = '/moder';
+
+    //Common commands
+    public const COMMAND_HELP = '/help';
+    public const COMMAND_OBSCENE = '/obscene';
+    public const COMMAND_FORTUNE = '/fortune';
 
     public const COMMANDS = [
-        self::COMMAND_HELP => CommandHelp::class,
-        self::COMMAND_EVENTS => CommandEvents::class,
+        self::COMMAND_SAY => CommandSay::class,
+        self::COMMAND_SORRY => CommandSorry::class,
         self::COMMAND_STATUS => CommandStatus::class,
         self::COMMAND_TOGGLE => CommandToggle::class,
-        self::COMMAND_SUBSCRIBE => CommandSubscribe::class,
-        self::COMMAND_UNSUBSCRIBE => CommandUnsubscribe::class,
+
+        self::COMMAND_EVENTS => CommandEvents::class,
         self::COMMAND_ADD_EVENT => CommandAddEvent::class,
         self::COMMAND_DEL_EVENT => CommandDelEvent::class,
-        self::COMMAND_ADMIN => CommandAdmin::class,
-        self::COMMAND_MODER => CommandModer::class,
-        self::COMMAND_OBSCENE => CommandObscene::class,
-        self::COMMAND_SORRY => CommandSorry::class,
-        self::COMMAND_FORTUNE => CommandFortune::class,
-        self::COMMAND_TOP => CommandTop::class,
-        self::COMMAND_SAY => CommandSay::class,
+        self::COMMAND_SUBSCRIBE => CommandSubscribe::class,
+        self::COMMAND_UNSUBSCRIBE => CommandUnsubscribe::class,
+
         self::COMMAND_ADD => CommandAdd::class,
         self::COMMAND_DEL => CommandDel::class,
-        self::COMMAND_COMMAND => CommandReaction::class,
         self::COMMAND_ENABLE => CommandEnable::class,
         self::COMMAND_DISABLE => CommandDisable::class,
+        self::COMMAND_COMMAND => CommandReaction::class,
         self::COMMAND_COMMANDS => CommandReactions::class,
-    ];
 
-    public const DESCRIPTIONS = [
-        self::COMMAND_HELP => 'доступные команды',
-        self::COMMAND_EVENTS => 'список событий',
-        self::COMMAND_STATUS => 'статус бота',
-        self::COMMAND_TOGGLE => 'включить/отключить бота',
-        self::COMMAND_SUBSCRIBE => 'подписаться на событие <ID>',
-        self::COMMAND_UNSUBSCRIBE => 'отписаться от события <ID>',
-        self::COMMAND_ADD_EVENT => 'добавить событие',
-        self::COMMAND_DEL_EVENT => 'удалить событие <ID>',
-        self::COMMAND_TOP => 'топ болтушек',
-        self::COMMAND_FORTUNE => 'гадалка, задай вопрос, ответ на который: ДА/НЕТ',
+        self::COMMAND_STORY => CommandStory::class,
+        self::COMMAND_STORY_ADD => CommandStoryAdd::class,
+        self::COMMAND_STORY_DEL => CommandStoryDel::class,
+        self::COMMAND_STORY_UP => CommandStoryVoteUp::class,
+        self::COMMAND_STORY_DOWN => CommandStoryVoteDown::class,
+        self::COMMAND_STORY_LAST => CommandStoryLast::class,
+
+        self::COMMAND_TOP => CommandTop::class,
+        self::COMMAND_ADMIN => CommandAdmin::class,
+        self::COMMAND_MODER => CommandModer::class,
+
+        self::COMMAND_OBSCENE => CommandObscene::class,
+        self::COMMAND_FORTUNE => CommandFortune::class,
+        self::COMMAND_HELP => CommandHelp::class,
     ];
 
     protected Payload $payload;

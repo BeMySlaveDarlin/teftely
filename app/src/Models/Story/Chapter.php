@@ -32,26 +32,36 @@ class Chapter extends Model
         return $this;
     }
 
-    public static function findOrCreate(Database $database, ?string $chapterId = null, ?array $chapterData = []): self
+    public static function findOne(Database $database, string $chapterId): ?self
     {
-        $chapter = self::findOne($database, $chapterId ?? $chapterData['id']);
-        if (null === $chapter) {
-            $chapter = self::createOne($database, $chapterData);
-        }
-
-        return $chapter;
-    }
-
-    public static function findOne(Database $database, ?string $chapterId = null): ?self
-    {
-        if (null === $chapterId) {
-            return null;
-        }
-
         $result = $database->db()
             ->select()
             ->from('story_chapters')
             ->where('id', '=', $chapterId)
+            ->run()
+            ->fetch();
+
+        if (!empty($result)) {
+            $chapter = new self($database);
+            $chapter->assign(
+                $result['id'],
+                $result['from_id'],
+                $result['chapter'],
+                $result['status']
+            );
+
+            return $chapter;
+        }
+
+        return null;
+    }
+
+    public static function findLast(Database $database): ?self
+    {
+        $result = $database->db()
+            ->select()
+            ->from('story_chapters')
+            ->orderBy('id', 'DESC')
             ->run()
             ->fetch();
 
@@ -114,9 +124,49 @@ class Chapter extends Model
         return $chapter;
     }
 
+    public function getVotes(): string
+    {
+        $query = $this->database->db()
+            ->select(['SUM(vote)'])
+            ->from('story_votes')
+            ->where('chapter_id', '=', $this->id)
+            ->groupBy('chapter_id');
+
+        return $query->run()->fetchColumn() ?: '0';
+    }
+
+    public function isVoted(string $fromId): ?string
+    {
+        $query = $this->database->db()
+            ->select(['id'])
+            ->from('story_votes')
+            ->where('chapter_id', '=', $this->id)
+            ->where('from_id', '=', $fromId)
+            ->limit(1)
+            ->run();
+
+        return $query->fetchColumn() ?: null;
+    }
+
+    public function vote(string $fromId, bool $vote = true): bool
+    {
+        $table = $this->database->db()->table('story_votes');
+
+        return (bool) $table->insertOne([
+            'from_id' => $fromId,
+            'chapter_id' => $this->id,
+            'vote' => $vote ? 1 : -1,
+        ]);
+    }
+
     public function getId(): ?int
     {
         return $this->id ?? null;
+    }
+
+    public function getFromId(): ?string
+    {
+        return $this->fromId;
     }
 
     public function getAuthor(): string
@@ -134,9 +184,9 @@ class Chapter extends Model
         return $this->chapter;
     }
 
-    public function getVotes(): ?array
+    public function getChapterHtml(): string
     {
-        return null;
+        return str_replace("\n", '<br>', $this->chapter);
     }
 
     public function isPublished(): bool
@@ -166,7 +216,7 @@ class Chapter extends Model
     public function delete(string $fromId): bool
     {
         $user = User::findOne($this->database, $fromId);
-        if (isset($this->id)) {
+        if (isset($this->id) && null !== $user) {
             if (($fromId === $this->fromId && $this->isPending()) || $user->isAdmin()) {
                 $table = $this->database->db()->table('story_chapters');
 

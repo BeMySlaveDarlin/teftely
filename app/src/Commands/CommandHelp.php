@@ -9,6 +9,20 @@ use Teftely\Components\Database;
 
 class CommandHelp extends Command
 {
+    public const DESCRIPTIONS = [
+        self::COMMAND_EVENTS => 'список событий',
+        self::COMMAND_EVENTS . ' <ID>' => 'конкретное событие',
+        self::COMMAND_STATUS => 'статус бота',
+        self::COMMAND_TOGGLE => 'включить/отключить бота',
+        self::COMMAND_SUBSCRIBE . ' <ID>' => 'подписаться на событие',
+        self::COMMAND_UNSUBSCRIBE . ' <ID>' => 'отписаться от события',
+        self::COMMAND_ADD_EVENT => 'добавить событие',
+        self::COMMAND_DEL_EVENT . ' <ID>' => 'удалить событие',
+        self::COMMAND_TOP => 'топ болтушек',
+        self::COMMAND_FORTUNE => 'гадалка, задай вопрос, ответ на который: ДА/НЕТ',
+        self::COMMAND_STORY => 'помощь по историям',
+    ];
+
     public function run(Config $vkConfig, Database $database): void
     {
         $this->params['peer_id'] = $this->payload->getPeerId();

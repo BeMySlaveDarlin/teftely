@@ -105,6 +105,11 @@ class User extends Model
         return explode(' ', (string) $this->fullName)[0] ?? 'Эй ты';
     }
 
+    public function getFromId(): ?string
+    {
+        return $this->fromId;
+    }
+
     public function isUser(): bool
     {
         return $this->isAdmin === self::STATUS_USER;

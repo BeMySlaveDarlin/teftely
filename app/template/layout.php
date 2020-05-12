@@ -50,7 +50,7 @@ use Teftely\Models\Story\Chapter;
                                 data-id="<?= $chapter->getId() ?>"
                                 title="Автор: <?= $chapter->getAuthor() ?>"
                             >
-                                <?= $chapter->getChapter() ?>
+                                <?= $chapter->getChapterHtml() ?>
                             </div>
                         <?php } ?>
                         <div class="page-counter"><?= $page ?></div>
