@@ -14,11 +14,11 @@ class Peer extends Model
 
     public function assign(
         $id,
-        string $peerId,
+        $peerId,
         $isEnabled = null
     ): self {
         $this->id = (int) $id;
-        $this->peerId = $peerId;
+        $this->peerId = (string) $peerId;
         $this->isEnabled = (bool) $isEnabled;
 
         return $this;
@@ -34,7 +34,7 @@ class Peer extends Model
         return $peer;
     }
 
-    public static function findOne(Database $database, $peerId): self
+    public static function findOne(Database $database, $peerId): ?self
     {
         if (null === $peerId) {
             return null;
@@ -61,7 +61,7 @@ class Peer extends Model
         return null;
     }
 
-    public static function createOne(Database $database, string $peerId): ?self
+    public static function createOne(Database $database, $peerId): ?self
     {
         $table = $database->db()->table('peers');
         $peerData = [

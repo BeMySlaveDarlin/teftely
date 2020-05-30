@@ -70,7 +70,7 @@ class Application
         do {
             try {
                 $time = date('H:i:00', strtotime('+3 hours'));
-                $week = (string) date('w', strtotime(date('Y-m-d ') . $time));
+                $week = (string) date('w', strtotime('+3 hours'));
                 print "Sending events for time $time" . PHP_EOL;
 
                 $peersEvents = Event::findListActive($this->database, $time);
