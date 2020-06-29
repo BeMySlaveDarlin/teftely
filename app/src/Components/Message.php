@@ -26,6 +26,15 @@ class Message
         }
         $method = $command->getMethod();
         $params = $command->getParams();
+        if (isset($params['pages'])) {
+            foreach ($params['pages'] as $page) {
+                $params['message'] = $params['messages'][$page];
+
+                $result = $response->send($vkConfig, $method, $params);
+            }
+
+            return $result;
+        }
 
         return $response->send($vkConfig, $method, $params);
     }

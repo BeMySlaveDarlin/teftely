@@ -18,6 +18,7 @@ class Response
             unset($params['peer_id'], $params['random_id']);
         }
 
+        unset($params['messages'], $params['pages']);
         $url = $vkConfig->get('api_endpoint') . $method;
 
         $curl = curl_init($url);

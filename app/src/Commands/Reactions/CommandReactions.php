@@ -21,11 +21,20 @@ class CommandReactions extends Command
         $reactions = Reaction::findList($database, $user->isAdmin() ? null : Reaction::STATUS_ACTIVE);
         if (!empty($reactions) && $peer->isEnabled()) {
             $message = "Список пользовательских команд:\n\n";
+            $reactionsChunked = array_chunk($reactions, 10);
+            foreach ($reactionsChunked as $page => $reactions) {
+                $this->params['pages'][] = $page;
+                foreach ($reactions as $reaction) {
+                    $message = "";
+                    $message .= "Команда: {$reaction->getCommand()}\n";
+                    $message .= "Статус: {$reaction->getStatus()}\n";
+                    $message .= "Сообщение: {$reaction->getMessage(null)}\n";
+                    $message .= "Есть вложение? {$reaction->hasAttachment()}\n\n";
+                }
+                $this->params['messages'][$page] = $message;
+            }
+
             foreach ($reactions as $reaction) {
-                $message .= "Команда: {$reaction->getCommand()}\n";
-                $message .= "Статус: {$reaction->getStatus()}\n";
-                $message .= "Сообщение: {$reaction->getMessage(null)}\n";
-                $message .= "Есть вложение? {$reaction->hasAttachment()}\n\n";
             }
         }
 

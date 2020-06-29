@@ -36,10 +36,16 @@ class CommandEvents extends Command
                     $message = "Событие #$eventId не найдено";
                 }
             } else {
-                $message = "Список событий:\n\n";
                 $events = Event::findList($database);
-                foreach ($events as $eventId => $event) {
-                    $message .= $event->getFormattedMessage($peersEvents);
+                $message = "Список событий:\n\n";
+                $eventsChunked = array_chunk($events, 10);
+                foreach ($eventsChunked as $page => $events) {
+                    $message = "";
+                    $this->params['pages'][] = $page;
+                    foreach ($events as $eventId => $event) {
+                        $message .= $event->getFormattedMessage($peersEvents);
+                    }
+                    $this->params['messages'][$page] = $message;
                 }
             }
         }
