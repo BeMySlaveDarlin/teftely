@@ -27,7 +27,6 @@ use Teftely\Commands\Story\CommandStoryVoteDown;
 use Teftely\Commands\Story\CommandStoryVoteUp;
 use Teftely\Commands\Users\CommandAdmin;
 use Teftely\Commands\Users\CommandModer;
-use Teftely\Commands\Users\CommandTop;
 use Teftely\Components\Config;
 use Teftely\Components\Database;
 use Teftely\Components\Message;
@@ -104,7 +103,6 @@ abstract class Command
         self::COMMAND_STORY_DOWN => CommandStoryVoteDown::class,
         self::COMMAND_STORY_LAST => CommandStoryLast::class,
 
-        self::COMMAND_TOP => CommandTop::class,
         self::COMMAND_ADMIN => CommandAdmin::class,
         self::COMMAND_MODER => CommandModer::class,
 
@@ -128,15 +126,12 @@ abstract class Command
         $commandWord = array_shift($messageTextParts);
         $payload = implode($delimiter, $messageTextParts);
 
-        $isCommand = false;
         $commandClass = null;
         if (isset(self::COMMANDS[$commandWord])) {
             $commandClass = self::COMMANDS[$commandWord];
-            $isCommand = true;
         } else {
             $reaction = Reaction::findOne($database, $messageText);
             if (null !== $reaction && $reaction->isEnabled()) {
-                $isCommand = true;
                 $payload = $reaction->getCommand();
                 $commandClass = self::COMMANDS[self::COMMAND_COMMAND];
             } else {
@@ -150,7 +145,7 @@ abstract class Command
             }
         }
         if (is_string($messageText) && !empty($messageText)) {
-            self::saveMessage($vkConfig, $database, $request, $messageText, $isCommand);
+            self::findOrCreateUser($vkConfig, $database, $request);
         }
 
         if ($commandClass !== null) {
@@ -165,12 +160,10 @@ abstract class Command
         return null;
     }
 
-    public static function saveMessage(
+    public static function findOrCreateUser(
         Config $vkConfig,
         Database $database,
-        object $request,
-        string $text,
-        $commandClass = false
+        object $request
     ): void {
         try {
             $payload = new Payload($request);
@@ -188,10 +181,7 @@ abstract class Command
                 if (!empty($user['response'][0]['first_name'])) {
                     $fullName = trim($user['response'][0]['first_name'] . ' ' . ($user['response'][0]['last_name'] ?? null));
                 }
-                $user = User::createOne($database, $payload->getFromId(), $fullName);
-            }
-            if (false === $commandClass) {
-                $user->saveMessage($payload->getPeerId(), $text);
+                User::createOne($database, $payload->getFromId(), $fullName);
             }
         } catch (Throwable $throwable) {
             throw $throwable;

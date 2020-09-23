@@ -90,11 +90,6 @@ class User extends Model
         return $query->groupBy('users.from_id')->fetchAll();
     }
 
-    public function saveMessage($peerId, $text): void
-    {
-        Message::create($this->database, $peerId, $this->fromId, $text);
-    }
-
     public function getFullName(): ?string
     {
         return $this->fullName;

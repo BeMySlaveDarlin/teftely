@@ -95,7 +95,6 @@ class Application
                                 $params['attachment'] = $event->getAttachment();
                             }
                             $this->response->send($this->config->get(Config::VK_CONFIG), Message::METHOD_SEND, $params);
-                            $this->logger->log(Logger::INFO, 'sent event', $params);
                         } catch (Throwable $throwable) {
                             $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
                         }
@@ -115,10 +114,7 @@ class Application
         try {
             /** @var Message $message */
             $message = EventManager::unpack($argv[1]);
-            $response = $message->send($this->config->get(Config::VK_CONFIG), $this->database, $this->response);
-            if (!empty($response)) {
-                $this->logger->log(Logger::INFO, $response);
-            }
+            $message->send($this->config->get(Config::VK_CONFIG), $this->database, $this->response);
         } catch (Throwable $throwable) {
             $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
         }
