@@ -69,19 +69,20 @@ class Application
     {
         do {
             try {
-                $time = date('H:i:00', strtotime('+3 hours'));
-                $week = (string) date('w', strtotime('+3 hours'));
-                print "Sending events for time $time" . PHP_EOL;
+                $dateTime = date('Y-m-d H:i:00', strtotime('+3 hours'));
+                $week = (string) date('w', strtotime($dateTime));
+                print "Sending events for time $dateTime" . PHP_EOL;
 
+                $time = explode(' ', $dateTime)[1];
                 $peersEvents = Event::findListActive($this->database, $time);
                 $foundPE = count($peersEvents);
-                print "Found {$foundPE} events" . PHP_EOL;
+                print "Found {$foundPE} events for time {$time}" . PHP_EOL;
 
                 foreach ($peersEvents as $eventId => $events) {
                     foreach ($events as $peerId => $event) {
                         try {
                             $eventWeek = $event->getWeek();
-                            if (null !== $eventWeek && $week !== $eventWeek) {
+                            if (null !== $eventWeek && $week !== (string) $eventWeek) {
                                 print "Skipping event #$eventId: wrong weekday" . PHP_EOL;
                                 continue;
                             }
@@ -100,7 +101,7 @@ class Application
                         }
                     }
                 }
-                print 'All events sent' . PHP_EOL;
+                print "{$foundPE} events sent" . PHP_EOL;
             } catch (Throwable $throwable) {
                 $this->logger->log(Logger::INFO, $throwable->getMessage(), $throwable->getTrace());
             }
