@@ -69,7 +69,7 @@ class Application
     {
         do {
             try {
-                $dateTime = date('Y-m-d H:i:00', strtotime('+3 hours'));
+                $dateTime = date('Y-m-d H:i:00');
                 $week = (string) date('w', strtotime($dateTime));
                 print "Sending events for time $dateTime" . PHP_EOL;
 
