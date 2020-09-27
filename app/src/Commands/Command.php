@@ -19,12 +19,6 @@ use Teftely\Commands\Reactions\CommandDisable;
 use Teftely\Commands\Reactions\CommandEnable;
 use Teftely\Commands\Reactions\CommandReaction;
 use Teftely\Commands\Reactions\CommandReactions;
-use Teftely\Commands\Story\CommandStory;
-use Teftely\Commands\Story\CommandStoryAdd;
-use Teftely\Commands\Story\CommandStoryDel;
-use Teftely\Commands\Story\CommandStoryLast;
-use Teftely\Commands\Story\CommandStoryVoteDown;
-use Teftely\Commands\Story\CommandStoryVoteUp;
 use Teftely\Commands\Users\CommandAdmin;
 use Teftely\Commands\Users\CommandModer;
 use Teftely\Components\Config;
@@ -59,14 +53,6 @@ abstract class Command
     public const COMMAND_COMMAND = '/command';
     public const COMMAND_COMMANDS = '/commands';
 
-    //Story related commands
-    public const COMMAND_STORY = '/story';
-    public const COMMAND_STORY_ADD = '/story_add';
-    public const COMMAND_STORY_DEL = '/story_del';
-    public const COMMAND_STORY_UP = '/story_up';
-    public const COMMAND_STORY_DOWN = '/story_down';
-    public const COMMAND_STORY_LAST = '/story_last';
-
     //User related commands
     public const COMMAND_TOP = '/top';
     public const COMMAND_ADMIN = '/admin';
@@ -95,13 +81,6 @@ abstract class Command
         self::COMMAND_DISABLE => CommandDisable::class,
         self::COMMAND_COMMAND => CommandReaction::class,
         self::COMMAND_COMMANDS => CommandReactions::class,
-
-        self::COMMAND_STORY => CommandStory::class,
-        self::COMMAND_STORY_ADD => CommandStoryAdd::class,
-        self::COMMAND_STORY_DEL => CommandStoryDel::class,
-        self::COMMAND_STORY_UP => CommandStoryVoteUp::class,
-        self::COMMAND_STORY_DOWN => CommandStoryVoteDown::class,
-        self::COMMAND_STORY_LAST => CommandStoryLast::class,
 
         self::COMMAND_ADMIN => CommandAdmin::class,
         self::COMMAND_MODER => CommandModer::class,

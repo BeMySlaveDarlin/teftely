@@ -20,7 +20,6 @@ class CommandHelp extends Command
         self::COMMAND_DEL_EVENT . ' <ID>' => 'удалить событие',
         self::COMMAND_TOP => 'топ болтушек',
         self::COMMAND_FORTUNE => 'гадалка, задай вопрос, ответ на который: ДА/НЕТ',
-        self::COMMAND_STORY => 'помощь по историям',
     ];
 
     public function run(Config $vkConfig, Database $database): void
